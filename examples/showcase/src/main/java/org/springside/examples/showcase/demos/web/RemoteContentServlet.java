@@ -5,7 +5,9 @@
  *******************************************************************************/
 package org.springside.examples.showcase.demos.web;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,15 +20,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -186,4 +191,38 @@ public class RemoteContentServlet extends HttpServlet {
 			logger.error("Status code:" + e.getStatusCode(), e);
 		}
 	}
+	
+
+	
+	public static void main(String[] args){
+		
+		// 获取内容
+		HttpPost httpPost = new HttpPost("http://gxoa.cc/login!login.do?userName=王月谭&userPassword=gxuser&loginState=1");
+		
+		// 创建包含connection pool与超时设置的client
+		RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(20 * 1000)
+				.setConnectTimeout(20 * 1000).build();
+
+		CloseableHttpClient  httpClient = HttpClientBuilder.create().setMaxConnTotal(20).setMaxConnPerRoute(20)
+				.setDefaultRequestConfig(requestConfig).build();
+		try {
+			CloseableHttpResponse  closeableHttpResponse = httpClient.execute(httpPost);
+			System.out.println(IOUtils.toString(closeableHttpResponse.getEntity().getContent(), "UTF-8"));
+			//http://gxoa.cc/attachmentDownload.do?filePath=2011-08/2011-08-30-d5ff8983-ec0e-40d2-ba0e-d0281e33ce86-GXTC-CZ-1105016-采购邀请书-公安部窗帘谈判公告.rar&amp;fileName=GXTC-CZ-1105016-采购邀请书
+			//http://gxoa.cc/attachmentDownload.do?filePath=2014-12/2014-12-16-b9ab5473-4fba-4da7-85fe-018a7c669d22-GXTC-1407073-招标公告&投标邀请-1407073政府采购招标公告.rar&amp;fileName=GXTC-1407073-招标公告&投标邀请-1407073政府采购招标公告
+			HttpGet httpGet = new HttpGet("http://gxoa.cc/attachmentDownload.do?filePath=2014-12/2014-12-16-b9ab5473-4fba-4da7-85fe-018a7c669d22-GXTC-1407073-招标公告&投标邀请-1407073政府采购招标公告.rar&amp;fileName=GXTC-1407073-招标公告&投标邀请");
+			CloseableHttpResponse closeableHttpResponseFile = httpClient.execute(httpGet);
+			//FileOutputStream fileOutputStream = new FileOutputStream(new File("D:\"));
+			//System.out.println(IOUtils.toString(closeableHttpResponseFile.getEntity().getContent(), "UTF-8"));
+			FileUtils.writeByteArrayToFile(new File("D:/upload/oa/temp"), IOUtils.toByteArray(closeableHttpResponseFile.getEntity().getContent()));
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
 }

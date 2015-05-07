@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<buyer xmlns='http://www.gpcsoft.com'>
+	<body>
+		<buyerInfo>
+			<buyerId>10634</buyerId>
+			<buyerName>岑巩县公安局</buyerName>
+			<buyerCode>1</buyerCode>
+			<registeredCapital>1</registeredCapital>
+			<legalPerson>1</legalPerson>
+			<mainProducts>1</mainProducts>
+			<belongIndustry>（015）机械工业</belongIndustry>
+			<belongArea></belongArea>
+			<entPrpt></entPrpt>
+			<parentUnit></parentUnit>
+			<telephone>1</telephone>
+			<fax>1</fax>
+			<email>11111@163.com</email>
+			<postCode>551000</postCode>
+			<address>1</address>
+		</buyerInfo>
+	</body>
+</buyer>

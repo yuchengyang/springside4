@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- 
+	/** serialVersionUID */
+	private static final long serialVersionUID = 1L;
+	private String projCode;//项目编号
+	private String projName;//项目名称
+	private String ebuyMethod; //招标方式（如公开，邀请）
+	private String content; //招标内容
+	private String buyerId; //委托单位（委托单位的机构代码）
+	private String buyerLinkerName; //预算单位联系人
+	private String buyerLinkerPhone; //预算单位联系电话
+	private String categoryCode; //招标类型（采购品目，如货物类）
+	private Date createDate; //立项日期
+	private String department; //立项部门（部门编码，类似机构代码）
+	private BigDecimal totalBudget; //项目投资规模（单位：元）
+	private Date entrustDate; //委托日期
+ -->
+<project xmlns='http://www.gpcsoft.com'>
+	<header>
+		<pmOrgId>30</pmOrgId>
+		<pmUserId>109</pmUserId>
+	</header>
+	<body>
+		<projectInfo>
+			<projCode>0723-094009010002</projCode>
+			<projName>中国计量科学研究院实验基地霍尔电阻器件及约瑟夫森结制作设备及安装项目</projName>
+			<ebuyMethod>00</ebuyMethod>
+			<content>霍尔电阻器件及约瑟夫森结制作设备及安装</content>
+			<buyerId>2720</buyerId>
+			<buyerLinkerName>李俊峰</buyerLinkerName>
+			<buyerLinkerPhone></buyerLinkerPhone>
+			<categoryCode>A</categoryCode>
+			<createDate>2009-06-12 00:00:00</createDate>
+			<department>30</department>
+			<totalBudget>546910000.000000</totalBudget>
+			<entrustDate>2009-06-09 00:00:00</entrustDate>
+		</projectInfo>
+	</body>
+</project>

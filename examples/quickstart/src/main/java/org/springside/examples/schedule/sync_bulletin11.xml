@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<bulletin xmlns='http://www.gpcsoft.com'>
+	<header>
+		<pmOrgId>108</pmOrgId>
+		<pmUserId>514</pmUserId>
+	</header>
+	<body>
+		<projectInfo>
+			<projCode>GXTC-1112234</projCode>
+			<bulletinTitle></bulletinTitle>
+			<bulletinContent></bulletinContent>
+			<signStartTime></signStartTime>
+			<signEndTime>2011-12-08 00:00:00</signEndTime>
+			<bidStartTime>2011-12-22 10:00:00</bidStartTime>
+			<bidEndTime>2012-03-20 00:00:00</bidEndTime>
+			<openBidTime>2011-12-22 10:00:00</openBidTime>
+			<meetRoomAddress>北京市宣武区广安门外大街甲122号广运饭店8楼会议室</meetRoomAddress>
+			<bulletinUrl>http://gxoa.cc/attachmentDownload.do?filePath=2011-12%2F2011-12-02-88dd5114-8d9d-45c2-959c-fbeff6d30bc9-GXTC-1112234-%E6%8B%9B%E6%A0%87%E5%85%AC%E5%91%8A%26%E6%8A%95%E6%A0%87%E9%82%80%E8%AF%B7-528-234-%E6%8B%9B%E6%A0%87%E5%85%AC%E5%91%8A.rar&amp;fileName=GXTC-1112234-招标公告---投标邀请
+
+http://gxoa.cc/attachmentDownload.do?filePath=2011-08/2011-08-30-d5ff8983-ec0e-40d2-ba0e-d0281e33ce86-GXTC-CZ-1105016-采购邀请书-公安部窗帘谈判公告.rar&amp;fileName=GXTC-CZ-1105016-采购邀请书
+			
+			
+			
+			</bulletinUrl>
+		</projectInfo>
+	</body>
+</bulletin>

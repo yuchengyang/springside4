@@ -447,7 +447,7 @@
 	<build>
 		<plugins>
 			<!-- 增加functional test的Source目录 -->
-			<plugin>
+<!-- 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
 				<executions>
@@ -464,7 +464,7 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 
 			<!-- test插件, 设定內存 -->
 			<plugin>
