@@ -2,6 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>io.springside</groupId>
+		<artifactId>springside-parent</artifactId>
+		<version>4.3.0-SNAPSHOT</version>
+		<relativePath>../../modules/parent/</relativePath>
+	</parent>
 	<groupId>io.springside.examples</groupId>
 	<artifactId>quickstart</artifactId>
 	<version>4.3.0-SNAPSHOT</version>
@@ -13,7 +19,7 @@
 		<springside.version>4.3.0-SNAPSHOT</springside.version>
 		<spring.version>4.1.3.RELEASE</spring.version>
 		<hibernate.version>4.3.7.Final</hibernate.version>
-		<spring-data-jpa.version>1.7.1.RELEASE</spring-data-jpa.version>
+		<spring-data-jpa.version>1.6.5.RELEASE</spring-data-jpa.version>
 		<tomcat-jdbc.version>7.0.57</tomcat-jdbc.version>
 		<sitemesh.version>2.4.2</sitemesh.version>
 		<shiro.version>1.2.3</shiro.version>
@@ -126,7 +132,20 @@
 			<version>${jdbc.driver.version}</version>
 			<scope>runtime</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.22</version>
+			<scope>runtime</scope>
+		</dependency>
+		
 		<!-- PERSISTENCE end -->
+		
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
 
 		<!-- WEB begin -->
 		<dependency>
@@ -146,7 +165,13 @@
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
 		</dependency>
-
+		
+		<dependency>
+	  		<groupId>taglibs</groupId>
+	  		<artifactId>standard</artifactId>
+	  		<version>1.1.2</version>
+	  	</dependency>
+		
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -244,6 +269,10 @@
 			<version>${commons-lang3.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${guava.version}</version>
@@ -331,6 +360,22 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<!-- SPRING basic begin -->
+		<!-- email/scheduler/freemarker -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+		</dependency>
+		<!-- SPRING basic end -->
+		
+		<!-- TIMER -->
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>${quartz.version}</version>
+		</dependency>
+		
 
 		<!-- h2  如果生产数据库不是H2，解开下面的注释
 		<dependency>
@@ -418,7 +463,7 @@
 			</plugin>
 
 			<!-- 增加functional test的Source目录 -->
-			<plugin>
+<!-- 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
 				<version>1.9.1</version>
@@ -436,7 +481,7 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 
 			<!-- cobertura插件, 设置不需要计算覆盖率的类 -->
 			<plugin>

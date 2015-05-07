@@ -9,6 +9,7 @@
 		<param-value>
 			classpath*:/applicationContext.xml,
 			classpath*:/applicationContext-shiro.xml
+			classpath*:/applicationContext-quartz-cron-local.xml
 		</param-value>
 	</context-param>
 	<context-param>

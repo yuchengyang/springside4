@@ -15,7 +15,7 @@
 	<description>Spring公共配置 </description>
 
 	<!-- 使用annotation 自动注册bean, 并保证@Required、@Autowired的属性被注入 -->
-	<context:component-scan base-package="org.springside.examples.quickstart">
+	<context:component-scan base-package="org.springside.examples">
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
 		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
 	</context:component-scan>
@@ -33,6 +33,24 @@
 		</property>
 	</bean>
 	
+	<!-- Jpa Entity Manager 配置 -->
+	<bean id="entityManagerFactoryMysql" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"> 
+		<property name="dataSource" ref="dataSourceMySql"/>
+		<property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter"/>
+		<property name="packagesToScan" value="org.springside.examples.oadata"/>
+		<property name="jpaProperties">
+			<props>
+				<!-- 命名规则 My_NAME->MyName -->
+				<prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- jdbc template mysqlJdbcTempalte -->
+    <bean id="mysqlJdbcTempalte" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSourceMySql"/>
+    </bean>
+	
 	<bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
 		<property name="databasePlatform">
 			<bean factory-method="getDialect" class="org.springside.modules.persistence.Hibernates">
@@ -44,13 +62,25 @@
 	<!-- Spring Data Jpa配置 -->
  	<jpa:repositories base-package="org.springside.examples.quickstart"  transaction-manager-ref="transactionManager" entity-manager-factory-ref="entityManagerFactory"/>
    
+   	<!-- Spring Data Jpa配置 -->
+ 	<jpa:repositories base-package="org.springside.examples.oadata"  transaction-manager-ref="transactionManagerMysql" entity-manager-factory-ref="entityManagerFactoryMysql"/>
+   
+   
 	<!-- Jpa 事务配置 -->
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="entityManagerFactory"/>
 	</bean>
+	
+		<!-- Jpa 事务配置 -->
+	<bean id="transactionManagerMysql" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactoryMysql"/>
+	</bean>
 
 	<!-- 使用annotation定义事务 -->
 	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
+	
+		<!-- 使用annotation定义事务 -->
+	<tx:annotation-driven transaction-manager="transactionManagerMysql" proxy-target-class="true" />
 
 	<!-- JSR303 Validator定义 -->
  	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
@@ -59,6 +89,12 @@
  	<beans profile="production">
  		<context:property-placeholder ignore-unresolvable="true"
 			location="classpath*:/application.properties" />	
+			
+		<bean id="propertiesLoader" class="org.springside.modules.utils.PropertiesLoader">
+			<constructor-arg>
+				<value>classpath:/application.properties</value>
+			</constructor-arg>
+		</bean>
 		
 		<!-- 数据源配置, 使用Tomcat JDBC连接池 -->
 		<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
@@ -74,6 +110,22 @@
 			<property name="minIdle" value="0" />
 			<property name="defaultAutoCommit" value="false" />
 		</bean>
+		
+		<!-- 数据源配置,mysql 连接 使用Tomcat JDBC连接池 -->
+		<bean id="dataSourceMySql" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
+			<!-- Connection Info -->
+			<property name="driverClassName" value="${jdbc.mysql.driver}" />
+			<property name="url" value="${jdbc.mysql.url}" />
+			<property name="username" value="${jdbc.mysql.username}" />
+			<property name="password" value="${jdbc.mysql.password}" />
+		
+			<!-- Connection Pooling Info -->
+			<property name="maxActive" value="${jdbc.pool.maxActive}" />
+			<property name="maxIdle" value="${jdbc.pool.maxIdle}" />
+			<property name="minIdle" value="0" />
+			<property name="defaultAutoCommit" value="false" />
+		</bean>
+		
 		
 		<!-- 数据源配置,使用应用服务器的数据库连接池 -->
 		<!--<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/ExampleDB" />-->
