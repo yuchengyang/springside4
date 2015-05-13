@@ -22,8 +22,6 @@ import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.jasper.tagplugins.jstl.When;
-
 import com.google.common.collect.Lists;
 
 //JPA标识

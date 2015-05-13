@@ -160,16 +160,15 @@ public class ProjectDataService {
 				result = result && sysProjectProccess( projectData );
 			}
 			if(ProjectData.SYNSTATUS_BASEINFO_SUCCESS >= projectData.getSynStatus() ){
+				//同步招标文件
+				result = result && projecgtRuleViewService.sysProjectDoc(projectData);
+			}
+			if(ProjectData.SYNSTATUS_DOC_SUCCESS >= projectData.getSynStatus() ){
 				//同步公告
 				if( projectData.getBulletinDataSelected() != null ){
 					result = result && bulletinDataService.sysBulletinProccess( projectData );
 				}
 			}
-			if(ProjectData.SYNSTATUS_BULLETIN_SUCCESS >= projectData.getSynStatus() ){
-				//同步招标文件
-				result = result && projecgtRuleViewService.sysProjectDoc(projectData);
-			}
-			
 			resultreturn = resultreturn &  result;
 		}
 		return resultreturn;

@@ -200,7 +200,7 @@ public class ScheduleService {
 		System.out.println("抓取采购人数据"+buyerDatas.size()+"条，step="+stepJumpBuyer);
 
 		//step计数器
-		if(buyerDatas.size() == 0){
+		if(buyerDatas.size() == 0 && stepJumpBuyer <=  300000 ){
 			stepJumpBuyer += stepJumpBuyer;
 		}else{
 			stepJumpBuyer = STEPJUMPBUYERNUM;
