@@ -136,10 +136,10 @@ public class ProjectDataService {
 	public boolean synProject(String[] ids) {
 		//方法执行结果
 		
-		boolean resultreturn = true;
+		boolean resultreturn = false;
 
 		for(String id : ids){
-			boolean result = true;
+			boolean result = false;
 			
 			String [] idArray = id.split(":");
 			
@@ -153,23 +153,23 @@ public class ProjectDataService {
 			
 			if(ProjectData.SYNSTATUS_STANBY  >=  projectData.getSynStatus()  ){
 				//同步采购人
-				result = result && buyerDataService.synBuyerProccess( projectData );
+				result = result || buyerDataService.synBuyerProccess( projectData );
 			}
 			if(ProjectData.SYNSTATUS_BUYERINFO_SUCCESS  >=  projectData.getSynStatus()  ){
 				//同步项目
-				result = result && sysProjectProccess( projectData );
+				result = result || sysProjectProccess( projectData );
 			}
 			if(ProjectData.SYNSTATUS_BASEINFO_SUCCESS >= projectData.getSynStatus() ){
 				//同步招标文件
-				result = result && projecgtRuleViewService.sysProjectDoc(projectData);
+				result = result || projecgtRuleViewService.sysProjectDoc(projectData);
 			}
 			if(ProjectData.SYNSTATUS_DOC_SUCCESS >= projectData.getSynStatus() ){
 				//同步公告
 				if( projectData.getBulletinDataSelected() != null ){
-					result = result && bulletinDataService.sysBulletinProccess( projectData );
+					result = result || bulletinDataService.sysBulletinProccess( projectData );
 				}
 			}
-			resultreturn = resultreturn &  result;
+			resultreturn = resultreturn ||  result;
 		}
 		return resultreturn;
 	}
