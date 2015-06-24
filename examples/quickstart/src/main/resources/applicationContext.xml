@@ -111,6 +111,12 @@
 			<property name="defaultAutoCommit" value="false" />
 		</bean>
 		
+		<!-- 此处还是使用初始化数据表结构 -->
+		<jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">
+			<jdbc:script location="classpath:sql/h2/schema.sql" />
+			<jdbc:script location="classpath:sql/h2/oatable.sql" />
+		</jdbc:initialize-database>	
+		
 		<!-- 数据源配置,mysql 连接 使用Tomcat JDBC连接池 -->
 		<bean id="dataSourceMySql" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
 			<!-- Connection Info -->

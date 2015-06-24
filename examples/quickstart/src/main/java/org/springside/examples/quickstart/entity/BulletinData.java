@@ -195,10 +195,15 @@ public class BulletinData extends IdEntity {
 		this.uploadDate = uploadDate;
 	}
 
-	@XmlElement(name="bulletinUrl")
 	public String getAttachmentPath() {
 		return attachmentPath;
 	}
+	@Transient
+	@XmlElement(name="bulletinUrl")
+	public String getBulletinUrl(){
+		return attachmentPath+"*"+attachmentName;
+	}
+	
 
 	public void setAttachmentPath(String attachmentPath) {
 		this.attachmentPath = attachmentPath;

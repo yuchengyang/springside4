@@ -178,6 +178,12 @@ public class BuyerDataService {
 	public boolean synBuyerProccess( ProjectData projectData){
 		//方法执行结果
 		boolean result = false;
+		
+		//采购人的代码不能为空
+		if( projectData.getDelegateCompany() == null ){
+			return result;
+		}
+		
 		List<BuyerData> buyerDatas = buyerDataDao.findBuyerData( Integer.parseInt( projectData.getDelegateCompany() ) );
 		
 		if(buyerDatas!=null && buyerDatas.size() > 0 ){

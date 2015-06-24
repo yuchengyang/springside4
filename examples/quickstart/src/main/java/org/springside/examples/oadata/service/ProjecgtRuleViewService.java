@@ -116,7 +116,12 @@ public class ProjecgtRuleViewService {
 			List<ProjectDocView> projectDocViews = projectDocViewDao.queryProjectDocView( projectData.getProjectId() , "2");
 			 
 			if( projectDocViews != null && projectDocViews.size() >0 ){//设置招标文件地址
-				projectRuleView.setPurchaseDocUrl( projectDocViews.get(0).getAttachmentPath()  );
+				List<String> purchaseDocUrls = new ArrayList<String>();
+				for(ProjectDocView projectDocView : projectDocViews){
+					purchaseDocUrls.add( projectDocView.getAttachmentPath() + "*" + projectDocView.getAttachmentName());
+				}
+				//多个以逗号分隔
+				projectRuleView.setPurchaseDocUrl( StringUtils.join(purchaseDocUrls, ",") );
 			}
 			
 			//发送
@@ -167,6 +172,17 @@ public class ProjecgtRuleViewService {
 			}
 		}
 		return result;
+	}
+	
+	
+	public static void main (String [] args){
+		
+		String  a = "123412341324*asdfasdfadsf";
+		String [] asStrings  = a.split("\\*");
+		
+		for (String string : asStrings) {
+			System.out.println(string);
+		}
 	}
 	
 }

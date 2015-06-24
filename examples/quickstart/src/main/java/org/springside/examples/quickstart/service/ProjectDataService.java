@@ -113,7 +113,7 @@ public class ProjectDataService {
 		} else if ("title".equals(sortType)) {
 			sort = new Sort(Direction.ASC, "title");
 		} else {
-			sort = new Sort(Direction.DESC, "delegateDate");
+			sort = new Sort(Direction.DESC, "delegateDate" , "id");
 		}
 		return new PageRequest(pageNumber - 1, pagzSize, sort);
 	}
@@ -153,20 +153,20 @@ public class ProjectDataService {
 			
 			if(ProjectData.SYNSTATUS_STANBY  >=  projectData.getSynStatus()  ){
 				//同步采购人
-				result = result || buyerDataService.synBuyerProccess( projectData );
+				result = result | buyerDataService.synBuyerProccess( projectData );
 			}
-			if(ProjectData.SYNSTATUS_BUYERINFO_SUCCESS  >=  projectData.getSynStatus()  ){
+			if(ProjectData.SYNSTATUS_BUYERINFO_SUCCESS  ==  projectData.getSynStatus()  ){
 				//同步项目
-				result = result || sysProjectProccess( projectData );
+				result = result | sysProjectProccess( projectData );
 			}
-			if(ProjectData.SYNSTATUS_BASEINFO_SUCCESS >= projectData.getSynStatus() ){
+			if(ProjectData.SYNSTATUS_BASEINFO_SUCCESS == projectData.getSynStatus() ){
 				//同步招标文件
-				result = result || projecgtRuleViewService.sysProjectDoc(projectData);
+				result = result | projecgtRuleViewService.sysProjectDoc(projectData);
 			}
-			if(ProjectData.SYNSTATUS_DOC_SUCCESS >= projectData.getSynStatus() ){
+			if(ProjectData.SYNSTATUS_DOC_SUCCESS == projectData.getSynStatus() ){
 				//同步公告
 				if( projectData.getBulletinDataSelected() != null ){
-					result = result || bulletinDataService.sysBulletinProccess( projectData );
+					result = result | bulletinDataService.sysBulletinProccess( projectData );
 				}
 			}
 			resultreturn = resultreturn ||  result;

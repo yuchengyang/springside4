@@ -50,6 +50,7 @@
 				}else{
 					alert("操作失败！");
 				}
+				window.location.reload();
 			});
 	}
 	
@@ -95,7 +96,7 @@
 				<td style="width:380px;"><a href="#">${project.projectName}</a></td>
 				<td style="width:50px;"><a href="#">${project.creatorName}</a></td>
 				<td style="width:80px;"><fmt:formatDate value="${project.delegateDate}" pattern="yyyy-MM-dd"/></td>
-				<td>${fn:length( project.projectPkgDatas ) > 0 }</td>
+				<td>${fn:length( project.projectPkgDatas ) > 0?'是':'否' }</td>
 				<td>${project.synStatusCN }</td>
 				<td>
 					<c:forEach var="bulletinData" items="${project.bulletinDatas}">
