@@ -68,9 +68,18 @@
 		<div class="span4 offset7">
 			<form class="form-search" action="#">
 			<label>名称：</label>
-			<input type="text" name="search_LIKE_projectName" class="input-medium" value="${param.search_LIKE_projectName}">
+			<input type="text" name="search_LIKE_projectName"class="input-medium" value="${param.search_LIKE_projectName}">
 			<label>项目经理：</label>
-			<input type="text" name="search_LIKE_creatorName"  value="${param.search_LIKE_creatorName}">
+			<input type="text" name="search_LIKE_creatorName" class="input-medium" value="${param.search_LIKE_creatorName}">
+			<label>项目部门：</label>
+			<input type="text" name="search_LIKE_organizationName" class="input-medium"  value="${param.search_LIKE_organizationName}">
+			<br>
+			<label>时间：</label>
+			<input type="text" name="search_GTE_delegateDate" class="input-medium"  value="${param.search_GTE_delegateDate}">
+			至
+			<input type="text" name="search_LTE_delegateDate" class="input-medium"  value="${param.search_LTE_delegateDate}">
+			例如（2001-05）
+			
 			<button type="submit" class="btn" id="search_btn">Search</button>
 		    </form>
 	    </div>
@@ -82,6 +91,7 @@
 		<th><input type="checkbox" id="checkAll" onchange="checkAllorNot(this);"></th>
 		<th>项目名称</th>
 		<th>项目经理</th>
+		<th>项目部门</th>
 		<th>立项日期</th>
 		<th>是否分包</th>
 		<th>同步阶段</th>
@@ -95,6 +105,7 @@
 				<td style="width:20px;"><input type="checkbox" name="checkID"  <c:if test="${project.synStatus eq '4' }">disabled="disabled"  readonly="readonly" </c:if>value="${project.id}"></td>
 				<td style="width:380px;"><a href="#">${project.projectName}</a></td>
 				<td style="width:50px;"><a href="#">${project.creatorName}</a></td>
+				<td style="width:50px;"><a href="#">${project.organizationName}</a></td>
 				<td style="width:80px;"><fmt:formatDate value="${project.delegateDate}" pattern="yyyy-MM-dd"/></td>
 				<td>${fn:length( project.projectPkgDatas ) > 0?'是':'否' }</td>
 				<td>${project.synStatusCN }</td>

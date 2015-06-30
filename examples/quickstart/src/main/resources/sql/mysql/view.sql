@@ -28,7 +28,7 @@ SELECT
 	`r`.DELEGATE_COMPANY,-- 委托单位（委托单位的机构代码）
 	 rc.CUSTOMER_CORPORATE,	--  预算单位联系人
    	 rc.CUSTOMER_TELEPHONE,	--  预算单位联系电话
-	`r`.DELEGATE_DATE,-- 立项日期 （编号日期是否就是立项日期? 或者 委托日期是否就是立项日期?）
+	pp.CREATE_DATE as DELEGATE_DATE,-- 立项日期 （编号日期是否就是立项日期? 或者 委托日期是否就是立项日期?）
 	`r`.DELEGATE_AMOUNT,-- 项目投资规模（单位：元）
 	`r`.`creator_name` -- AS `项目经理`,
    ,`r`.CREATOR -- AS `项目经理id`,
@@ -40,11 +40,13 @@ FROM
 	`report_project` `r` 
 left join res_customer rc on rc.CUSTOMER_ID = `r`.DELEGATE_COMPANY
 LEFT join pro_bid_section pbs on `r`.PROJECT_ID = pbs.PROJECT_ID
+, pro_project   pp 
 WHERE
-	`r`.`finished_approval` = 1
+ `r`.PROJECT_ID = pp.PROJECT_ID 
+and `r`.`finished_approval` = 1
 AND `r`.`project_type_id` IN('BID', 'PROCUREMENT')
-AND `r`.`organization_type` = 3
-AND `r`.`not_include` = 0
+-- AND `r`.`organization_type` = 3
+-- AND `r`.`not_include` = 0
 
 UNION all 
 
@@ -75,7 +77,7 @@ UNION all
 	r.DELEGATE_COMPANY,-- 委托单位（委托单位的机构代码）
 	rc.CUSTOMER_CORPORATE,	--  预算单位联系人
   rc.CUSTOMER_TELEPHONE,	--  预算单位联系电话
-	r.DELEGATE_DATE,-- 立项日期 （编号日期是否就是立项日期? 或者 委托日期是否就是立项日期?）
+	pp.CREATE_DATE as DELEGATE_DATE,-- 立项日期 （编号日期是否就是立项日期? 或者 委托日期是否就是立项日期?）
 	r.DELEGATE_AMOUNT,-- 项目投资规模（单位：元）
 	r.`creator_name` -- AS `项目经理`,
    ,r.CREATOR -- AS `项目经理id`,
@@ -83,18 +85,16 @@ UNION all
    , null as PROJECT_parent_id -- 父级项目
    from report_project r 
 	left join res_customer rc on rc.CUSTOMER_ID = r.DELEGATE_COMPANY
+, pro_project   pp 
 where 	
-r.`finished_approval` = 1
+ `r`.PROJECT_ID = pp.PROJECT_ID 
+and r.`finished_approval` = 1
 AND r.`project_type_id` IN('BID', 'PROCUREMENT')
-AND r.`organization_type` = 3
-AND r.`not_include` = 0 
+-- AND r.`organization_type` = 3
+-- AND r.`not_include` = 0 
 and EXISTS ( select '1' from pro_bid_section pbss where pbss.PROJECT_ID = r.PROJECT_ID );
 
-
 create or replace view view_oa_service_customer as
-/*
-招标人视图表   依赖项目信息视图 view_oa_service_projectinfo
-*/
 SELECT `r`.`customer_id`                  ,-- AS `招标人id`,
        `r`.`customer_name`                ,-- AS `招标人名称`,
 	   -- 缺少 招标人代码
@@ -105,8 +105,10 @@ SELECT `r`.`customer_id`                  ,-- AS `招标人id`,
        `r`.`customer_post_no`            --  AS `邮编`
 	   ,`r`.CUSTOMER_FAX-- 传真
 ,`r`.CUSTOMER_TELEPHONE
-FROM  `res_customer` `r`  
-where `r`.customer_id in (select vp.DELEGATE_COMPANY  from  view_oa_service_projectinfo vp   );
+FROM  `res_customer` `r` , report_project p  
+where  `r`.CUSTOMER_ID  = p.DELEGATE_COMPANY 
+and p.`finished_approval` = 1
+AND p.`project_type_id` IN('BID', 'PROCUREMENT');
 	
 
 create or replace view view_oa_service_announcement  as 
@@ -133,25 +135,15 @@ FROM
 LEFT JOIN pro_bid_project pbp ON pba.project_id = pbp.bid_project_id
 LEFT JOIN pro_project p ON pba.project_id = p.project_id
  , pro_project_attachment ppa
-,sys_attachment saa
+,sys_attachment saa , report_project r 
 where 
 	ppa.attachment_id = saa.attachment_id
-          AND   ppa.doc_type_id IN (18,42)
+AND   ppa.doc_type_id IN (18,42)
 and ppa.PROJECT_ID = pba.PROJECT_ID
-and
-
-EXISTS( 
-select '1' from 
-	report_project r
-WHERE
-	r .finished_approval = 1
-AND 	r.project_type_id IN('BID', 'PROCUREMENT')
-AND 	r.organization_type = 3
-AND 	r.not_include = 0
-and r.project_id = pba.PROJECT_ID
-
- ) and EXISTS (  select '1' from pro_project_attachment ppa where  ppa.PROJECT_ID =  pba.PROJECT_ID AND ppa.doc_type_id IN(18, 42) );
-		
+and r .finished_approval = 1
+AND r.project_type_id IN('BID', 'PROCUREMENT')
+and r.project_id = pba.PROJECT_ID;
+	
  
 create or replace view view_oa_service_announcementdoc  as 
 /*

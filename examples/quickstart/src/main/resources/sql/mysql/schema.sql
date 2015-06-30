@@ -19,3 +19,5 @@ create table ss_user (
 	register_date timestamp not null default 0,
 	primary key (id)
 ) engine=InnoDB;
+
+insert into ss_user (id, login_name, name, password, salt, roles, register_date) values(1,'admin','admin','2cee6d37b34ff12f62066ad1190791af342e0c35','8701f6f67d53fa49','user','2015-06-04 17:29:54');

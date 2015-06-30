@@ -36,7 +36,7 @@
 			</bean>
 		</property>
 		<!-- 周一至五,朝九晚五工作时间内每半小时执行一次 -->
-		<property name="cronExpression" value="0 0/1 * ? * *" />
+		<property name="cronExpression" value="0 0/2 * ? * *" />
 	</bean>
 	<!-- *************************从oa抓取数据***************************** -->
 
