@@ -5,10 +5,12 @@
  *******************************************************************************/
 package org.springside.modules.persistence;
 
+import java.text.ParseException;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 
 import com.google.common.collect.Maps;
 
@@ -48,6 +50,16 @@ public class SearchFilter {
 				throw new IllegalArgumentException(key + " is not a valid search filter name");
 			}
 			String filedName = names[1];
+			
+			if(filedName.toUpperCase().contains("DATE")){//增加日期默认带有date的属性可以用日期查询
+				try {
+					value = DateUtils.parseDate(value.toString(), "yyyy-MM");
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
 			Operator operator = Operator.valueOf(names[0]);
 
 			// 创建searchFilter
