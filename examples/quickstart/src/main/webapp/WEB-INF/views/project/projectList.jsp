@@ -104,7 +104,7 @@
 				<td style="width:20px;"><input type="checkbox" name="checkID"  <c:if test="${project.synStatus eq '4' }">disabled="disabled"  readonly="readonly" </c:if>value="${project.id}"></td>
 				<td style="width:380px;"><a href="#">${project.projectName}</a></td>
 				<td style="width:50px;"><a href="#">${project.creatorName}</a></td>
-				<td style="width:50px;"><a href="#">${project.organizationName}</a></td>
+				<td style="width:100px;"><a href="#">${project.organizationName}</a></td>
 				<td style="width:80px;"><fmt:formatDate value="${project.delegateDate}" pattern="yyyy-MM-dd"/></td>
 				<td>${project.synStatusCN }</td>
 				<td>
