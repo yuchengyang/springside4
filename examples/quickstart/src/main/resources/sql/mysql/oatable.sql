@@ -66,3 +66,8 @@ create table oa_buyer (
 	primary key (id)
 );
 
+
+create index IDX_PROJ_TYPE  on OA_PROJECT  (PROJ_TYPE ); 
+create index IDX_PROJECT_PARENT_ID  on OA_PROJECT  (PROJECT_PARENT_ID  ); 
+create index IDX_BULLETIN_PROJ_ID   on OA_BULLETIN  (PROJECT_ID ); 
+
