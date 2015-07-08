@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.taglibs.standard.extra.spath.Step;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +48,8 @@ public class ScheduleService {
 	static int stepJumpProject = STEPJUMPPROJECTNUM;
 	/*抓取频率  以月为单位 2个月*/
 	static int stepJumpBulletin = STEPJUMPBULLETINNUM;
+	
+	static Date backSynProjectFromDate = null;
 
 	@Autowired
 	private BulletinViewDao bulletinViewDao;
@@ -115,18 +118,72 @@ public class ScheduleService {
 		//取出来
 		List<ProjectView> projectViews = projectViewDao.getProjectViewFromToTime(getFrom , getTo);
 		
-		//此处有一个特殊处理逻辑：回溯, 因为有些数据会在当前抓取日期之后冒出来，而当前最大日期 getFrom 却已经跨过  这些数据的创建时间， 这样的话这些数据是抓取不到的
-		if( getTo .after( new Date() ) ){
-			long oaprojCount = projectViewDao.count();
-			long projCount = projectDataDao.count();
-			if(oaprojCount != projCount){
-				//TODO
-			}
-		}
-		
 		//本地存储
 		List<ProjectData> projectDatas = new ArrayList<ProjectData>();
 		List<ProjectPkgData> projectPkgDatas = new ArrayList<ProjectPkgData>();
+		this.buildProjectAndPkg(projectViews, projectDatas, projectPkgDatas);
+		
+		//保存
+		projectDataDao.save( projectDatas );
+		projectDataDao.save( projectPkgDatas );
+		
+		//此处有一个特殊处理逻辑：回溯, 因为有些数据会在当前抓取日期之后冒出来，而当前最大日期 getFrom 却已经跨过  这些数据的创建时间， 这样的话这些数据是抓取不到的
+		Date currentDate = new Date();
+		if( getTo .after( currentDate ) ){//只有getTo 时间 大于当前时间，才走回溯逻辑
+			if( backSynProjectFromDate == null ){
+				backSynProjectFromDate = currentDate;//第一次赋值为当前时间
+			}
+			long oaprojCount = projectViewDao.countBeforeDate( backSynProjectFromDate );
+			long projCount = projectDataDao.countBeforeDate( backSynProjectFromDate );
+			if(oaprojCount != projCount){
+				//继续回溯 TODO  
+				
+				List<ProjectView> preProjectViews = projectViewDao.getProjectViewFromToTime(  DateUtils.addDays( backSynProjectFromDate , -7 ) , backSynProjectFromDate);
+				if(preProjectViews!=null && preProjectViews.size()>0){
+					//需要补齐的项目
+					List<ProjectView> filteredProjectViews = new ArrayList<ProjectView>();
+					for(ProjectView projectView : preProjectViews){
+						Long countUnit = projectDataDao.countByProjectId( projectView.getProjectId() );
+						if(countUnit!= null && countUnit > 0l){
+							continue;
+						}else{
+							filteredProjectViews.add(projectView);
+						}
+					}
+					List<ProjectData> projectDataBks = new ArrayList<ProjectData>();
+					List<ProjectPkgData> projectPkgDataBks = new ArrayList<ProjectPkgData>();
+					this.buildProjectAndPkg(filteredProjectViews, projectDataBks, projectPkgDataBks);
+					
+					//保存
+					projectDataDao.save( projectDataBks );
+					projectDataDao.save( projectPkgDataBks );
+				}
+				
+				backSynProjectFromDate =  DateUtils.addDays( backSynProjectFromDate , -7 ) ;//将回溯日期往前推
+			} else{
+				//已经相等则此次回溯完成 重新设置  backSynProjectFromDate 为null
+				backSynProjectFromDate  =null ;
+			}
+			System.out.println("已回溯至：" + backSynProjectFromDate);
+		}
+		
+		System.out.println("抓取项目数据"+projectDatas.size()+"条，step="+stepJumpProject);
+		//step计数器
+		if(projectDatas.size() == 0  && getTo.before( DateUtils.addMonths(new Date(), 12) ) ){//最多抓从今日至一年后的数据
+			stepJumpProject += stepJumpProject;
+		}else{
+			stepJumpProject = STEPJUMPPROJECTNUM;
+		}
+	}
+	
+	
+	/**
+	 * 装配  project  和  package 
+	 * @param projectViews
+	 * @param projectDatas
+	 * @param projectPkgDatas
+	 */
+	public void buildProjectAndPkg(List<ProjectView> projectViews ,  List<ProjectData>  projectDatas , List<ProjectPkgData> projectPkgDatas ){
 		
 		if(projectViews!=null && projectViews.size()>0){
 			for(ProjectView projectView : projectViews){
@@ -164,17 +221,7 @@ public class ScheduleService {
 			System.out.println("nomatch:"+ nomatch +":id"+ projectPkgData.getProjectId() + "pid:"+projectPkgData.getParentProject().getProjectId() );
 		}
 		
-		//保存
-		projectDataDao.save( projectDatas );
-		projectDataDao.save( projectPkgDatas );
 		
-		System.out.println("抓取项目数据"+projectDatas.size()+"条，step="+stepJumpProject);
-		//step计数器
-		if(projectDatas.size() == 0  && getTo.before( DateUtils.addMonths(new Date(), 12) ) ){//最多抓从今日至一年后的数据
-			stepJumpProject += stepJumpProject;
-		}else{
-			stepJumpProject = STEPJUMPPROJECTNUM;
-		}
 	}
 
 	public void updateGetedBuyer() throws Exception{
@@ -215,5 +262,4 @@ public class ScheduleService {
 			stepJumpBuyer = STEPJUMPBUYERNUM;
 		}
 	}
-
 }
