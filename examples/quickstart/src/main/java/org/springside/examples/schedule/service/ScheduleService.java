@@ -115,6 +115,14 @@ public class ScheduleService {
 		//取出来
 		List<ProjectView> projectViews = projectViewDao.getProjectViewFromToTime(getFrom , getTo);
 		
+		//此处有一个特殊处理逻辑：回溯, 因为有些数据会在当前抓取日期之后冒出来，而当前最大日期 getFrom 却已经跨过  这些数据的创建时间， 这样的话这些数据是抓取不到的
+		if( getTo .after( new Date() ) ){
+			long oaprojCount = projectViewDao.count();
+			long projCount = projectDataDao.count();
+			if(oaprojCount != projCount){
+			}
+		}
+		
 		//本地存储
 		List<ProjectData> projectDatas = new ArrayList<ProjectData>();
 		List<ProjectPkgData> projectPkgDatas = new ArrayList<ProjectPkgData>();
