@@ -44,14 +44,14 @@ public class ApiListController {
 			key = new String (Base64.decodeBase64(key) ) ;
 			long keyTime = Long.parseLong(key.replace(salt, "") ) ;
 			// ( ( new Date().getTime() * 4 +2 ) * 5 -1 ) * 8 + 3 
-			keyTime = ( ( ( keyTime -3 )/8 +1 ) /5 -2 )/4 ;// 约定算法
+			keyTime = ( ( ( keyTime -3 )/8 +1 ) /5 -2 )/4 ;// 约定算法  一定要注意两遍服务器的时间一定要同步   查看时间：date  同步时间：ntpdate cn.pool.ntp.org   
 			long currentTime = new Date().getTime();
 			if(! (  currentTime - 60000 < keyTime && keyTime < currentTime + 60000 )){
-				throw new Exception();
+				throw new Exception("服务器时间校验失败！");
 			}
 		} catch (Exception e) {
-			System.out.println("FTP请求校验出错!");
-			logger.error("FTP请求校验出错!");
+			System.out.println("FTP请求校验出错!"+ e.getMessage());
+			logger.error("FTP请求校验出错!"+e.getMessage());
 			return ;
 		}
 		

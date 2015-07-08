@@ -1,3 +1,5 @@
+use quickstart;
+
 -- drop table if exists oa_bulletin;
 
 create table oa_bulletin (
@@ -18,7 +20,7 @@ create table oa_bulletin (
 	attachment_path varchar(200),
 	upload_date timestamp,
 	primary key (id)
-);
+) charset utf8 collate utf8_general_ci;
 
 -- drop table if exists oa_project;
 
@@ -48,7 +50,7 @@ create table oa_project (
 	PROJ_TYPE char(1),
 	PROJECT_PARENT_ID varchar(19),
 	primary key (id)
-);
+) charset utf8 collate utf8_general_ci ;
 
 -- drop table if exists oa_buyer;
 create table oa_buyer (
@@ -64,10 +66,11 @@ create table oa_buyer (
 	CUSTOMER_TELEPHONE varchar(100),
 	SYN_STATUS char(1),
 	primary key (id)
-);
+) charset utf8 collate utf8_general_ci;
 
+commit;
 
-create index IDX_PROJ_TYPE  on OA_PROJECT  (PROJ_TYPE ); 
-create index IDX_PROJECT_PARENT_ID  on OA_PROJECT  (PROJECT_PARENT_ID  ); 
-create index IDX_BULLETIN_PROJ_ID   on OA_BULLETIN  (PROJECT_ID ); 
+create index IDX_PROJ_TYPE  on oa_project  (PROJ_TYPE ); 
+create index IDX_PROJECT_PARENT_ID  on oa_project  (PROJECT_PARENT_ID  ); 
+create index IDX_BULLETIN_PROJ_ID   on oa_bulletin  (PROJECT_ID ); 
 
