@@ -21,4 +21,7 @@ public interface ProjectViewDao extends PagingAndSortingRepository<ProjectView, 
 
 	@Query("SELECT min( delegateDate ) FROM ProjectView")
 	Date findMinDelegateDate();
+
+	@Query("SELECT count(projectId) FROM ProjectView where delegateDate < ?1")
+	Long countBeforeDate(Date date);
 }

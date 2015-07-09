@@ -39,6 +39,9 @@ public class ProjectData extends IdEntity {
 	public static final int SYNSTATUS_DOC_SUCCESS = 3;//采购文件信息
 	public static final int SYNSTATUS_BULLETIN_SUCCESS = 4;//公告信息
 	
+	public static final int USESTATUS_VALID = 1;//正常使用
+	public static final int USESTATUS_INVALID = -1;//非正常使用（删除）
+	
 	public static String PROJTYPE_PROJ = "m";
 	public static String PROJTYPE_PKG = "s";
 
@@ -65,6 +68,8 @@ public class ProjectData extends IdEntity {
     private String creator;//         creator_name    AS `项目经理id`,
     
 	private int synStatus;//同步状态 
+	
+	private int useStatus;//使用状态  1 -1 
 	
     private String projType;//项目类型（项目 ：m ， 包   ：s）
 	private List<ProjectPkgData> projectPkgDatas = Lists.newArrayList();
@@ -273,6 +278,14 @@ public class ProjectData extends IdEntity {
 	}
 	public void setSynStatus(int synStatus) {
 		this.synStatus = synStatus;
+	}
+	
+	@Column(name="USE_STATUS")                                                                                                                                     
+	public int getUseStatus() {
+		return useStatus;
+	}
+	public void setUseStatus(int useStatus) {
+		this.useStatus = useStatus;
 	}
 	
 	@Column(name="PROJ_TYPE" , insertable =false, updatable= false )

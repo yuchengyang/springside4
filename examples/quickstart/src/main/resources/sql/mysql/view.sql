@@ -95,7 +95,7 @@ AND r.`project_type_id` IN('BID', 'PROCUREMENT')
 and EXISTS ( select '1' from pro_bid_section pbss where pbss.PROJECT_ID = r.PROJECT_ID );
 
 create or replace view view_oa_service_customer as
-SELECT `r`.`customer_id`                  ,-- AS `招标人id`,
+SELECT distinct `r`.`customer_id`                  ,-- AS `招标人id`,
        `r`.`customer_name`                ,-- AS `招标人名称`,
 	   -- 缺少 招标人代码
        `r`.`customer_parent_organization` ,-- AS `上级单位`,

@@ -47,6 +47,7 @@ create table oa_project (
 	creator_name varchar(50),
 	creator varchar(50),
 	SYN_STATUS int(1),
+	USE_STATUS int(1),
 	PROJ_TYPE char(1),
 	PROJECT_PARENT_ID varchar(19),
 	primary key (id)

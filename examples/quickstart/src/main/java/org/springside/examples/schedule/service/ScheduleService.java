@@ -10,8 +10,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.taglibs.standard.extra.spath.Step;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,7 +87,7 @@ public class ScheduleService {
 			for(BulletinView bulletinView : bulletinViews){
 				BulletinData dest = new BulletinData();
 				BeanUtils.copyProperties(dest, bulletinView);
-				bulletinDatas.add(dest);
+				bulletinDatas.add(dest); 
 			}
 		}
 		//保存
@@ -136,27 +136,66 @@ public class ScheduleService {
 			long oaprojCount = projectViewDao.countBeforeDate( backSynProjectFromDate );
 			long projCount = projectDataDao.countBeforeDate( backSynProjectFromDate );
 			if(oaprojCount != projCount){
-				//继续回溯 TODO  
+				//继续回溯 
 				
-				List<ProjectView> preProjectViews = projectViewDao.getProjectViewFromToTime(  DateUtils.addDays( backSynProjectFromDate , -7 ) , backSynProjectFromDate);
-				if(preProjectViews!=null && preProjectViews.size()>0){
-					//需要补齐的项目
-					List<ProjectView> filteredProjectViews = new ArrayList<ProjectView>();
-					for(ProjectView projectView : preProjectViews){
-						Long countUnit = projectDataDao.countByProjectId( projectView.getProjectId() );
-						if(countUnit!= null && countUnit > 0l){
-							continue;
-						}else{
-							filteredProjectViews.add(projectView);
+				//回溯时间-7  至  回溯时间 内的项目（oa）
+				List<ProjectView> oaProjectViews = projectViewDao.getProjectViewFromToTime( DateUtils.addDays( backSynProjectFromDate , -7 ), backSynProjectFromDate);
+				//回溯时间-7  至  回溯时间 内的项目（local）
+				List<ProjectData> localProjectDatas = projectDataDao.getProjectViewFromToTime( DateUtils.addDays( backSynProjectFromDate , -7 ), backSynProjectFromDate);
+				
+				//不存在于local 中
+				List<ProjectView> notInLocalProjectViews = new ArrayList<ProjectView>();
+				//不存在于oa    中
+				List<ProjectData> notInOaProjectDatas = new ArrayList<ProjectData>();
+
+				System.out.println("projectviews:"+ oaProjectViews.size() +",projectdatas:"+localProjectDatas.size());
+				//遍历第一次
+				for( ProjectView projectView : oaProjectViews ){
+					boolean inLocal = false;
+					for( ProjectData projectData : localProjectDatas ){
+						System.out.println("projViewId:"+ projectView.getProjectId() +",projDataId:" + projectData.getProjectId());
+						if(StringUtils.equals(projectView.getProjectId(), projectData.getProjectId() )){
+							inLocal = true;
+							break;
 						}
 					}
+					if(!inLocal){
+						notInLocalProjectViews.add(projectView);
+					}
+				}
+				//遍历第二次
+				for( ProjectData projectData : localProjectDatas ){
+					boolean inOa = false;
+					for( ProjectView projectView : oaProjectViews ){
+						System.out.println("projDataId:"+ projectView.getProjectId() +",projViewId:" + projectData.getProjectId());
+						if(StringUtils.equals( projectData.getProjectId(), projectView.getProjectId())){
+							inOa = true;
+							break;
+						}
+					}
+					if(!inOa){
+						notInOaProjectDatas.add(projectData);
+					}
+				}
+				
+				//补足不在local中的
+				if(notInLocalProjectViews != null && notInLocalProjectViews.size() > 0 ){
 					List<ProjectData> projectDataBks = new ArrayList<ProjectData>();
 					List<ProjectPkgData> projectPkgDataBks = new ArrayList<ProjectPkgData>();
-					this.buildProjectAndPkg(filteredProjectViews, projectDataBks, projectPkgDataBks);
-					
-					//保存
+					this.buildProjectAndPkg(notInLocalProjectViews, projectDataBks, projectPkgDataBks);
 					projectDataDao.save( projectDataBks );
 					projectDataDao.save( projectPkgDataBks );
+					System.out.println("回溯抓取项目数据"+projectDataBks.size()+"条, 包数据："+projectPkgDataBks.size()+"条");
+				}
+				
+				//删除不在oa中的
+				if(notInOaProjectDatas != null && notInOaProjectDatas.size() >0 ){
+					for(ProjectData projectData : notInOaProjectDatas){
+						projectData.setUseStatus(ProjectData.USESTATUS_INVALID);//设置删除
+						//TODO 要不要关联同步属性
+					}
+					projectDataDao.save(notInOaProjectDatas);
+					System.out.println("回溯删除项目/包数据"+notInOaProjectDatas.size()+"条");
 				}
 				
 				backSynProjectFromDate =  DateUtils.addDays( backSynProjectFromDate , -7 ) ;//将回溯日期往前推
@@ -166,8 +205,7 @@ public class ScheduleService {
 			}
 			System.out.println("已回溯至：" + backSynProjectFromDate);
 		}
-		
-		System.out.println("抓取项目数据"+projectDatas.size()+"条，step="+stepJumpProject);
+		System.out.println("抓取项目数据"+projectDatas.size()+"条, 包数据："+projectPkgDatas.size()+"条，step="+stepJumpProject);
 		//step计数器
 		if(projectDatas.size() == 0  && getTo.before( DateUtils.addMonths(new Date(), 12) ) ){//最多抓从今日至一年后的数据
 			stepJumpProject += stepJumpProject;
@@ -175,7 +213,6 @@ public class ScheduleService {
 			stepJumpProject = STEPJUMPPROJECTNUM;
 		}
 	}
-	
 	
 	/**
 	 * 装配  project  和  package 
@@ -189,7 +226,7 @@ public class ScheduleService {
 			for(ProjectView projectView : projectViews){
 				if(projectView instanceof ProjectPkgView){
 					ProjectPkgView projectPkgView = (ProjectPkgView)projectView;
-					System.out.println("包名称:"+projectPkgView.getProjectName());
+					System.out.println("包ID:"+projectPkgView.getProjectId()+ ", 名称:"+projectPkgView.getProjectName());
 					ProjectPkgData dest = new ProjectPkgData();
 					org.springframework.beans.BeanUtils.copyProperties(projectPkgView, dest,"parentProject");
 					if( projectPkgView.getParentProject() != null ){
@@ -198,12 +235,14 @@ public class ScheduleService {
 						dest.setParentProject(parentDest);
 					}
 					dest.setSynStatus(ProjectData.SYNSTATUS_STANBY);
+					dest.setUseStatus(ProjectData.USESTATUS_VALID);
 					projectPkgDatas.add(dest);
 				} else{
-					System.out.println("项目名称:"+projectView.getProjectName());
+					System.out.println("项目ID:"+projectView.getProjectId() +", 名称:"+projectView.getProjectName());
 					ProjectData dest = new ProjectData();
 					org.springframework.beans.BeanUtils.copyProperties(projectView, dest, "parentProject");
 					dest.setSynStatus(ProjectData.SYNSTATUS_STANBY);
+					dest.setUseStatus(ProjectData.USESTATUS_VALID);
 					dest.setProjectPkgDatas(null);
 					projectDatas.add(dest);
 				}
@@ -218,12 +257,19 @@ public class ScheduleService {
 					nomatch = true;
 				}
 			}
+			
+			if( !nomatch ){
+				ProjectData  parentProject =  projectDataDao.getProject( projectPkgData.getParentProject().getProjectId() );
+				if(parentProject != null){
+					projectPkgData.setParentProject( parentProject );
+					nomatch = true;
+				}
+			}
+			
 			System.out.println("nomatch:"+ nomatch +":id"+ projectPkgData.getProjectId() + "pid:"+projectPkgData.getParentProject().getProjectId() );
 		}
-		
-		
 	}
-
+	
 	public void updateGetedBuyer() throws Exception{
 		//选出最大的立项时间,也就是 已更新至XX时间
 		Integer maxCustomerId = buyerDataDao.findMaxCustomerId();

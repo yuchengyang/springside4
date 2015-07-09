@@ -93,6 +93,7 @@
 		<th>项目经理</th>
 		<th>项目部门</th>
 		<th>立项日期</th>
+		<th>分包</th>
 		<th>同步阶段</th>
 		<th>公告</th>
 		</tr></thead>
@@ -106,6 +107,7 @@
 				<td style="width:50px;"><a href="#">${project.creatorName}</a></td>
 				<td style="width:100px;"><a href="#">${project.organizationName}</a></td>
 				<td style="width:80px;"><fmt:formatDate value="${project.delegateDate}" pattern="yyyy-MM-dd"/></td>
+				<td>${fn:length( project.projectPkgDatas ) > 0?'是':'否' }</td>
 				<td>${project.synStatusCN }</td>
 				<td>
 					<c:forEach var="bulletinData" items="${project.bulletinDatas}">
