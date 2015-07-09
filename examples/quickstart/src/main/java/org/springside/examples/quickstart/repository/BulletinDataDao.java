@@ -18,7 +18,7 @@ public interface BulletinDataDao extends PagingAndSortingRepository<BulletinData
 	@Query("SELECT max( announcementDate ) FROM BulletinData")
 	Date findMaxAnnouncementDate();
 	
-	
 	@Query("FROM BulletinData where projectId = ?1 ")
 	List<BulletinData> findBulletinData(String projectId);
+
 }

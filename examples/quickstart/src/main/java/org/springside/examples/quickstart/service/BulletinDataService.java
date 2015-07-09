@@ -219,7 +219,7 @@ public class BulletinDataService {
 					String operTag = StringUtils.substringBetween(xmlContentresp, "<operTag>", "</operTag>");
 					if("Y".equals(operTag)){//成功   
 						//更新同步状态 
-						bulletinData.setSynStatus( BuyerData.SYNSTATUS_SUCCESS );
+						bulletinData.setSynStatus( BulletinData.SYNSTATUS_SUCCESS );
 						bulletinDataDao.save( bulletinData );
 						//更新项目中的采购人信息成功状态
 						projectData.setSynStatus(ProjectData.SYNSTATUS_BULLETIN_SUCCESS );

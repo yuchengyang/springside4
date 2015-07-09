@@ -16,7 +16,7 @@ import org.springside.examples.oadata.entity.ProjectView;
 
 public interface ProjectViewDao extends PagingAndSortingRepository<ProjectView, String>, JpaSpecificationExecutor<ProjectView> {
 
-	@Query("from ProjectView as project  where project.delegateDate > ?1 and project.delegateDate < ?2 ")
+	@Query("from ProjectView as project  where project.delegateDate > ?1 and project.delegateDate <= ?2 ")
 	List<ProjectView> getProjectViewFromToTime(Date from, Date to);
 
 	@Query("SELECT min( delegateDate ) FROM ProjectView")

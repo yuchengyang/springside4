@@ -50,6 +50,9 @@ public class ScheduleService {
 	static int stepJumpBulletin = STEPJUMPBULLETINNUM;
 	
 	static Date backSynProjectFromDate = null;
+	
+	static Date backSynBulletinFromDate = null;
+
 
 	@Autowired
 	private BulletinViewDao bulletinViewDao;
@@ -87,6 +90,7 @@ public class ScheduleService {
 			for(BulletinView bulletinView : bulletinViews){
 				BulletinData dest = new BulletinData();
 				BeanUtils.copyProperties(dest, bulletinView);
+				dest.setSynStatus(BulletinData.SYNSTATUS_STANBY);
 				bulletinDatas.add(dest); 
 			}
 		}
@@ -153,13 +157,13 @@ public class ScheduleService {
 				for( ProjectView projectView : oaProjectViews ){
 					boolean inLocal = false;
 					for( ProjectData projectData : localProjectDatas ){
-						System.out.println("projViewId:"+ projectView.getProjectId() +",projDataId:" + projectData.getProjectId());
 						if(StringUtils.equals(projectView.getProjectId(), projectData.getProjectId() )){
 							inLocal = true;
 							break;
 						}
 					}
 					if(!inLocal){
+						System.out.println("notInLocalProjectViewId:"+ projectView.getProjectId());
 						notInLocalProjectViews.add(projectView);
 					}
 				}
@@ -167,13 +171,13 @@ public class ScheduleService {
 				for( ProjectData projectData : localProjectDatas ){
 					boolean inOa = false;
 					for( ProjectView projectView : oaProjectViews ){
-						System.out.println("projDataId:"+ projectView.getProjectId() +",projViewId:" + projectData.getProjectId());
 						if(StringUtils.equals( projectData.getProjectId(), projectView.getProjectId())){
 							inOa = true;
 							break;
 						}
 					}
 					if(!inOa){
+						System.out.println("notInOaProjectDataId:"+ projectData.getProjectId());
 						notInOaProjectDatas.add(projectData);
 					}
 				}
@@ -250,23 +254,24 @@ public class ScheduleService {
 		}
 
 		for(ProjectPkgData projectPkgData: projectPkgDatas){
-			boolean nomatch  = false;
+			boolean match  = false;
 			for ( ProjectData  projectData: projectDatas){
 				if (projectData.getProjectId()  .equals( projectPkgData.getParentProject().getProjectId()  ) ){
 					projectPkgData.setParentProject(projectData);
-					nomatch = true;
+					match = true;
+					break;
 				}
 			}
 			
-			if( !nomatch ){
+			if( !match ){
 				ProjectData  parentProject =  projectDataDao.getProject( projectPkgData.getParentProject().getProjectId() );
 				if(parentProject != null){
 					projectPkgData.setParentProject( parentProject );
-					nomatch = true;
+					match = true;
 				}
 			}
 			
-			System.out.println("nomatch:"+ nomatch +":id"+ projectPkgData.getProjectId() + "pid:"+projectPkgData.getParentProject().getProjectId() );
+			System.out.println("nomatch:"+ match +":id"+ projectPkgData.getProjectId() + "pid:"+projectPkgData.getParentProject().getProjectId() );
 		}
 	}
 	

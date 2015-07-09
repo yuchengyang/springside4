@@ -16,7 +16,7 @@ import org.springside.examples.oadata.entity.BulletinView;
 
 public interface BulletinViewDao extends PagingAndSortingRepository<BulletinView, String>, JpaSpecificationExecutor<BulletinView> {
 	
-	@Query("from BulletinView where announcementDate > ?1 and announcementDate < ?2 ")
+	@Query("from BulletinView where announcementDate > ?1 and announcementDate <=?2 ")
 	List<BulletinView> getBulletinViewFromToTime(Date from, Date to);
 
 	@Query("SELECT min( announcementDate ) FROM BulletinView ")

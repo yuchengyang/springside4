@@ -27,6 +27,6 @@ public interface ProjectDataDao extends PagingAndSortingRepository<ProjectData, 
 	@Query("from ProjectData as project where project.projectId = ?1  ")
 	ProjectData getProject(String projectId);
 	
-	@Query("from ProjectData as project  where project.useStatus=1 and project.delegateDate > ?1 and project.delegateDate < ?2 ")
+	@Query("from ProjectData as project  where project.useStatus=1 and project.delegateDate > ?1 and project.delegateDate <= ?2 ")
 	List<ProjectData> getProjectViewFromToTime(Date from, Date to);
 }

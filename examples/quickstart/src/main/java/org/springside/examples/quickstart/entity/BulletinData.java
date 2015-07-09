@@ -22,6 +22,9 @@ import org.apache.commons.lang3.StringUtils;
 @Table(name = "OA_BULLETIN")
 public class BulletinData extends IdEntity {
 	
+	public static String SYNSTATUS_STANBY = "0";
+	public static String SYNSTATUS_SUCCESS = "1";
+	public static String SYNSTATUS_FAILURE = "2";
 	
 	private String projectId ;//项目id
 	
@@ -178,7 +181,7 @@ public class BulletinData extends IdEntity {
 	public void setSynStatus(String synStatus) {
 		this.synStatus = synStatus;
 	}
-
+	
 	public String getAttachmentName() {
 		return attachmentName;
 	}
