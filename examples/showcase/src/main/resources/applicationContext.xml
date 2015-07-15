@@ -1,38 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context" 
-	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:jdbc="http://www.springframework.org/schema/jdbc"  
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
 		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
 		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.3.xsd"
-		default-lazy-init="true">
+	default-lazy-init="true">
 
-	<description>Spring公共配置</description>
+	<description>Spring公共配置 </description>
 
-	<!-- 使用annotation 自动注册bean,并检查@Required,@Autowired的属性已被注入 -->
-	<context:component-scan base-package="org.springside.examples.showcase">
+	<!-- 使用annotation 自动注册bean, 并保证@Required、@Autowired的属性被注入 -->
+	<context:component-scan base-package="org.springside.examples">
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
 		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
 	</context:component-scan>
 
 	<!-- Jpa Entity Manager 配置 -->
-	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"> 
 		<property name="dataSource" ref="dataSource"/>
 		<property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter"/>
-		<property name="packagesToScan" value="org.springside.examples.showcase"/>
+		<property name="packagesToScan" value="org.springside.examples.quickstart"/>
 		<property name="jpaProperties">
 			<props>
-				<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
-				<prop key="net.sf.ehcache.configurationResourceName">cache/ehcache-hibernate-local.xml</prop>
+				<!-- 命名规则 My_NAME->MyName -->
 				<prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
 			</props>
 		</property>
 	</bean>
+	
+	<!-- Jpa Entity Manager 配置 -->
+	<bean id="entityManagerFactoryMysql" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"> 
+		<property name="dataSource" ref="dataSourceMySql"/>
+		<property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter"/>
+		<property name="packagesToScan" value="org.springside.examples.oadata"/>
+		<property name="jpaProperties">
+			<props>
+				<!-- 命名规则 My_NAME->MyName -->
+				<prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- jdbc template mysqlJdbcTempalte -->
+    <bean id="mysqlJdbcTempalte" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSourceMySql"/>
+    </bean>
 	
 	<bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
 		<property name="databasePlatform">
@@ -42,71 +59,82 @@
 		</property>
 	</bean>
 
-	<!-- Spring Data Jpa配置, 扫描base-package下所有继承于Repository<T,ID>的接口 -->
- 	<jpa:repositories base-package="org.springside.examples.showcase" transaction-manager-ref="transactionManager" entity-manager-factory-ref="entityManagerFactory"/>
-	
-	<!-- MyBatis配置 -->
-	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="dataSource" ref="dataSource" />
-		<!-- 自动扫描entity目录, 省掉Configuration.xml里的手工配置 -->
-		<property name="typeAliasesPackage" value="org.springside.examples.showcase.entity" />
-		<!-- 显式指定Mapper文件位置 -->
-		<property name="mapperLocations" value="classpath:/mybatis/*Mapper.xml" />
-	</bean>
-	<!-- 扫描basePackage下所有以@MyBatisRepository标识的 接口-->
-	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="org.springside.examples.showcase" />
-		<property name="annotationClass" value="org.springside.examples.showcase.repository.mybatis.MyBatisRepository"/>
-	</bean>
-	
-	<!-- 事务管理器配置, Jpa单数据源事务 -->
+	<!-- Spring Data Jpa配置 -->
+ 	<jpa:repositories base-package="org.springside.examples.quickstart"  transaction-manager-ref="transactionManager" entity-manager-factory-ref="entityManagerFactory"/>
+   
+   	<!-- Spring Data Jpa配置 -->
+ 	<jpa:repositories base-package="org.springside.examples.oadata"  transaction-manager-ref="transactionManagerMysql" entity-manager-factory-ref="entityManagerFactoryMysql"/>
+   
+   
+	<!-- Jpa 事务配置 -->
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="entityManagerFactory"/>
 	</bean>
-
-	<!-- 另一个事务管理器, Jdbc单数据源事务 -->
-	<bean id="quartzTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="quartzDataSource" />
+	
+		<!-- Jpa 事务配置 -->
+	<bean id="transactionManagerMysql" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactoryMysql"/>
 	</bean>
 
 	<!-- 使用annotation定义事务 -->
 	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
 	
-	<!-- 定义aspectj -->
-	<aop:aspectj-autoproxy proxy-target-class="true"/>
+		<!-- 使用annotation定义事务 -->
+	<tx:annotation-driven transaction-manager="transactionManagerMysql" proxy-target-class="true" />
 
-	<!-- hibernate validator -->
-	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
-
+	<!-- JSR303 Validator定义 -->
+ 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+	
 	<!-- production环境 -->
-	<beans profile="production">
-		<context:property-placeholder ignore-resource-not-found="true"
+ 	<beans profile="production">
+ 		<context:property-placeholder ignore-unresolvable="true"
 			location="classpath*:/application.properties" />	
-
-		<!-- 数据源配置,使用应用内的Tomcat JDBC连接池 -->
+			
+		<bean id="propertiesLoader" class="org.springside.modules.utils.PropertiesLoader">
+			<constructor-arg>
+				<value>classpath:/application.properties</value>
+			</constructor-arg>
+		</bean>
+		
+		<!-- 数据源配置, 使用Tomcat JDBC连接池 -->
 		<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
 			<!-- Connection Info -->
 			<property name="driverClassName" value="${jdbc.driver}" />
 			<property name="url" value="${jdbc.url}" />
 			<property name="username" value="${jdbc.username}" />
 			<property name="password" value="${jdbc.password}" />
+		
+			<!-- Connection Pooling Info -->
 			<property name="maxActive" value="${jdbc.pool.maxActive}" />
 			<property name="maxIdle" value="${jdbc.pool.maxIdle}" />
 			<property name="minIdle" value="0" />
 			<property name="defaultAutoCommit" value="false" />
-			<!-- 连接Idle10分钟后超时，每1分钟检查一次 -->
-			<property name="timeBetweenEvictionRunsMillis" value="60000" />
-			<property name="minEvictableIdleTimeMillis" value="600000" />
 		</bean>
-	
-		<!-- quartz使用的数据源配置 -->
-		<bean id="quartzDataSource"  class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
-			<property name="driverClassName" value="${quartz.jdbc.driver}" />
-			<property name="url" value="${quartz.jdbc.url}" />
-			<property name="username" value="${quartz.jdbc.username}" />
-			<property name="password" value="${quartz.jdbc.password}" />
+		
+		<!-- 此处还是使用初始化数据表结构 -->
+		<jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">
+			<jdbc:script location="classpath:sql/mysql/schema.sql" />
+			<jdbc:script location="classpath:sql/mysql/oatable.sql" />
+		</jdbc:initialize-database>	
+		
+		<!-- 数据源配置,mysql 连接 使用Tomcat JDBC连接池 -->
+		<bean id="dataSourceMySql" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
+			<!-- Connection Info -->
+			<property name="driverClassName" value="${jdbc.mysql.driver}" />
+			<property name="url" value="${jdbc.mysql.url}" />
+			<property name="username" value="${jdbc.mysql.username}" />
+			<property name="password" value="${jdbc.mysql.password}" />
+		
+			<!-- Connection Pooling Info -->
+			<property name="maxActive" value="${jdbc.pool.maxActive}" />
+			<property name="maxIdle" value="${jdbc.pool.maxIdle}" />
+			<property name="minIdle" value="0" />
 			<property name="defaultAutoCommit" value="false" />
 		</bean>
+		
+		
+		<!-- 数据源配置,使用应用服务器的数据库连接池 -->
+		<!--<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/ExampleDB" />-->
 	</beans>
 	
 	<!-- local development环境 -->
@@ -123,23 +151,15 @@
 			<property name="password" value="${jdbc.password}" />
 			<property name="defaultAutoCommit" value="false" />
 		</bean>
-		
-		<!-- Spring Simple连接池 for quartz -->
-		<bean id="quartzDataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-			<property name="driverClass" value="${quartz.jdbc.driver}" />
-			<property name="url" value="${quartz.jdbc.url}" />
-			<property name="username" value="${quartz.jdbc.username}" />
-			<property name="password" value="${quartz.jdbc.password}" />
-		</bean>
 	</beans>
-
-	<!-- functional test环境 -->
+	
+	<!-- functional test 环境 -->
 	<beans profile="functional">
 		<context:property-placeholder ignore-resource-not-found="true"
 			location="classpath*:/application.properties,
           			  classpath*:/application.functional.properties,
           			  classpath*:/application.functional-local.properties" />	
-		
+
 		<!-- Tomcat JDBC连接池 -->
 		<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
 			<property name="driverClassName" value="${jdbc.driver}" />
@@ -148,28 +168,16 @@
 			<property name="password" value="${jdbc.password}" />
 			<property name="defaultAutoCommit" value="false" />
 		</bean>
-			
-		<!-- Spring Simple连接池 for quartz -->
-		<bean id="quartzDataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-			<property name="driverClass" value="${quartz.jdbc.driver}" />
-			<property name="url" value="${quartz.jdbc.url}" />
-			<property name="username" value="${quartz.jdbc.username}" />
-			<property name="password" value="${quartz.jdbc.password}" />
-		</bean>
-				
-		<!-- 初始化数据结构 -->
+
+		<!-- 初始化数据表结构 -->
 		<jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">
 			<jdbc:script location="classpath:sql/${db.type}/schema.sql" />
-		</jdbc:initialize-database>
-
-		<jdbc:initialize-database data-source="quartzDataSource" ignore-failures="ALL">
-			<jdbc:script location="classpath:sql/${db.type}/quartz.sql" />
-		</jdbc:initialize-database>
+		</jdbc:initialize-database>	
 	</beans>
 	
 	<!-- unit test环境 -->
 	<beans profile="test">
-		<context:property-placeholder ignore-resource-not-found="true"
+	 	<context:property-placeholder ignore-resource-not-found="true"
 			location="classpath*:/application.properties,
           			  classpath*:/application.test.properties" />	
 		
@@ -178,25 +186,13 @@
 			<property name="driverClass" value="${jdbc.driver}" />
 			<property name="url" value="${jdbc.url}" />
 			<property name="username" value="${jdbc.username}" />
-			<property name="password" value="${jdbc.password}" />	
+			<property name="password" value="${jdbc.password}" />
 		</bean>
-			
-		<!-- Spring Simple连接池 for quartz -->
-		<bean id="quartzDataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-			<property name="driverClass" value="${quartz.jdbc.driver}" />
-			<property name="url" value="${quartz.jdbc.url}" />
-			<property name="username" value="${quartz.jdbc.username}" />
-			<property name="password" value="${quartz.jdbc.password}" />
-		</bean>
-		
-		<!-- 初始化数据结构与默认数据 -->
+
+		<!-- 初始化数据表结构 与默认数据-->
 		<jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">
 			<jdbc:script location="classpath:sql/h2/schema.sql" />
-			<jdbc:script location="classpath:data/h2/import-data.sql" encoding="UTF-8" />
-		</jdbc:initialize-database>
-
-		<jdbc:initialize-database data-source="quartzDataSource" ignore-failures="ALL">
-			<jdbc:script location="classpath:sql/h2/quartz.sql" />
+			<jdbc:script location="classpath:data/h2/import-data.sql" encoding="UTF-8"/>
 		</jdbc:initialize-database>
 	</beans>
 </beans>

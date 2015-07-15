@@ -124,6 +124,8 @@ public class ProjectDataService {
 	private Specification<ProjectData> buildSpecification(Map<String, Object> searchParams) {
 		Map<String, SearchFilter> filters = SearchFilter.parse(searchParams);
 		filters.put("projType", new SearchFilter("projType", Operator.EQ, ProjectData.PROJTYPE_PROJ));
+		filters.put("useStatus", new SearchFilter("useStatus", Operator.EQ, ProjectData.USESTATUS_VALID));
+
 		Specification<ProjectData> spec = DynamicSpecifications.bySearchFilter(filters.values(), ProjectData.class);
 		return spec;
 	}

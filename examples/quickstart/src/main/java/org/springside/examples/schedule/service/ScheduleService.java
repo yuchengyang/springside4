@@ -140,6 +140,8 @@ public class ScheduleService {
 			long oaprojCount = projectViewDao.countBeforeDate( backSynProjectFromDate );
 			long projCount = projectDataDao.countBeforeDate( backSynProjectFromDate );
 			if(oaprojCount != projCount){
+				
+				System.out.println("oaprojCount:"+oaprojCount +", projCount:"+projCount);
 				//继续回溯 
 				
 				//回溯时间-7  至  回溯时间 内的项目（oa）

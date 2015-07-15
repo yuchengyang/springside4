@@ -5,14 +5,15 @@
  *******************************************************************************/
 package org.springside.examples.oadata.web.task;
 
-import java.util.Map;
+import javax.servlet.ServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springside.examples.oadata.service.BulletinViewService;
-
-import com.google.common.collect.Maps;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springside.examples.oadata.entity.ApplyCompanyView;
+import org.springside.examples.oadata.repository.AppCompanyViewDao;
 
 /**
  * Task管理的Controller, 使用Restful风格的Urls:
@@ -30,18 +31,14 @@ import com.google.common.collect.Maps;
 @RequestMapping(value = "/oa")
 public class OaController {
 	
-	private static Map<String, String> sortTypes = Maps.newLinkedHashMap();
-	static {
-		sortTypes.put("auto", "自动");
-		sortTypes.put("title", "标题");
-	}
-
 	@Autowired
-	private BulletinViewService bulletinViewService;
+	private AppCompanyViewDao appCompanyViewDao;
 	
-//	@RequestMapping(value = "getBulletin1", method = RequestMethod.GET)
-//	@ResponseBody
-//	public BulletinView getBulletin(@RequestParam("id") String id) {
-//		return bulletinViewService.getBulletinView(id);
-//	}
+	@RequestMapping(value = "getProjectDetail" , method = RequestMethod.GET)
+	public String list(Model model,ServletRequest request) {
+		
+		ApplyCompanyView AppCompanyView = appCompanyViewDao.findOne(102764l);
+
+		return "oa/projectDetail";
+	}
 }
