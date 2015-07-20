@@ -24,7 +24,7 @@ public interface ProjectDataDao extends PagingAndSortingRepository<ProjectData, 
 	@Query("SELECT count(1) FROM ProjectData as project where project.projectId = ?1")
 	Long countByProjectId(String projectId);
 	
-	@Query("from ProjectData as project where project.projectId = ?1  ")
+	@Query("from ProjectData as project where project.projectId = ?1 and project.useStatus=1 ")
 	ProjectData getProject(String projectId);
 	
 	@Query("from ProjectData as project  where project.useStatus=1 and project.delegateDate > ?1 and project.delegateDate <= ?2 ")
