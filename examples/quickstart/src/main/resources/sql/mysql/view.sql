@@ -175,13 +175,13 @@ view_oa_service_projectinfo vp where vp.project_id
  = bd.PROJECT_ID  and vp.proj_type = 'm'  ;
  
 create or replace view view_oa_service_projectdoc as 
-
 select 
 ppa.PROJECT_ATTACHMENT_ID , 
 ppa.PROJECT_ID  , -- 项目id 
 ppa.DOC_TYPE_ID  ,  -- 文件类型
 sa.ATTACHMENT_NAME , -- 文件名称
 sa.ATTACHMENT_PATH  -- 文件path
+, sa.UPLOAD_DATE
  from pro_project_attachment  ppa , sys_attachment sa 
 
 where ppa.ATTACHMENT_ID = sa.ATTACHMENT_ID;

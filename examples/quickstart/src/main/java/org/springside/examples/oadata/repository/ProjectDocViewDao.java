@@ -17,4 +17,7 @@ public interface ProjectDocViewDao extends PagingAndSortingRepository<ProjectDoc
 	
 	@Query("FROM ProjectDocView where projectId = ?1 and docTypeId = ?2")
 	List<ProjectDocView> queryProjectDocView(String projectId , String docTypeId);
+	
+	@Query("FROM ProjectDocView where projectId = ?1 order by uploadDate ")
+	List<ProjectDocView> queryProjectDocView(String projectId );
 }

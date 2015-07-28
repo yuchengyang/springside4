@@ -5,6 +5,8 @@
  *******************************************************************************/
 package org.springside.examples.oadata.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -28,6 +30,7 @@ public class ProjectDocView {
 	private String docTypeId ;
 	private String attachmentName ;
 	private String attachmentPath  ;
+	private Date uploadDate  ;
 	
 	@Id
 	public Long getProjectAttachmentId() {
@@ -65,5 +68,10 @@ public class ProjectDocView {
 	public void setAttachmentPath(String attachmentPath) {
 		this.attachmentPath = attachmentPath;
 	}
-	
+	public Date getUploadDate() {
+		return uploadDate;
+	}
+	public void setUploadDate(Date uploadDate) {
+		this.uploadDate = uploadDate;
+	}
 }

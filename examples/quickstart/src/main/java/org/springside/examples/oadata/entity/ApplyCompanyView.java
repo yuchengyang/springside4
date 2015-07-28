@@ -3,9 +3,11 @@ package org.springside.examples.oadata.entity;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "PRO_PROJECT_COMPANY")
@@ -14,6 +16,7 @@ public class ApplyCompanyView{
 	private Long projectId;
 	private Long bidSectionId;
 	private Long companyId;
+	private String companyName;
 	private Boolean buyPrequalificationDoc;
 	private Integer buyPrequalificationDocNum;
 	private Integer buyEPrequalificationDocNum;
@@ -47,8 +50,6 @@ public class ApplyCompanyView{
 	private BigDecimal depositAmount;
 	private Integer receiveMode;
 	private Date depositDate;
-	private String bidSectionCode;
-	private String bidSectionName;
 
 	public ApplyCompanyView() {
 	}
@@ -84,6 +85,15 @@ public class ApplyCompanyView{
 
 	public void setCompanyId(Long companyId) {
 		/* 172 */this.companyId = companyId;
+	}
+	
+	@Transient
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
 	}
 
 	public Boolean getBuyPrequalificationDoc() {
@@ -238,6 +248,7 @@ public class ApplyCompanyView{
 		/* 400 */this.creator = creator;
 	}
 
+	@Column(name="JOINT_PARENT_ID")
 	public Long getJoinParentId() {
 		/* 405 */return this.joinParentId;
 	}
@@ -246,6 +257,7 @@ public class ApplyCompanyView{
 		/* 410 */this.joinParentId = joinParentId;
 	}
 
+	@Column(name="E_PRE_DOC_PRICE")
 	public BigDecimal getEpreDocPrice() {
 		/* 415 */return this.epreDocPrice;
 	}
@@ -270,6 +282,7 @@ public class ApplyCompanyView{
 		/* 440 */this.bidDocPrice = bidDocPrice;
 	}
 
+	@Column(name="E_BID_DOC_PRICE")
 	public BigDecimal getEbidDocPrice() {
 		/* 445 */return this.ebidDocPrice;
 	}
@@ -278,6 +291,7 @@ public class ApplyCompanyView{
 		/* 450 */this.ebidDocPrice = ebidDocPrice;
 	}
 
+	@Column(name="BUY_E_PREQUALIFICATION_DOC_NUM")
 	public Integer getBuyEPrequalificationDocNum() {
 		/* 455 */return this.buyEPrequalificationDocNum;
 	}
@@ -286,6 +300,8 @@ public class ApplyCompanyView{
 		/* 460 */this.buyEPrequalificationDocNum = buyEPrequalificationDocNum;
 	}
 
+	
+	@Column(name="BUY_E_BID_DOC_NUM")
 	public Integer getBuyEBidDocNum() {
 		/* 465 */return this.buyEBidDocNum;
 	}
@@ -326,21 +342,6 @@ public class ApplyCompanyView{
 		/* 512 */this.depositAmount = depositAmount;
 	}
 
-	public String getBidSectionCode() {
-		/* 517 */return this.bidSectionCode;
-	}
-
-	public void setBidSectionCode(String bidSectionCode) {
-		/* 522 */this.bidSectionCode = bidSectionCode;
-	}
-
-	public String getBidSectionName() {
-		/* 527 */return this.bidSectionName;
-	}
-
-	public void setBidSectionName(String bidSectionName) {
-		/* 532 */this.bidSectionName = bidSectionName;
-	}
 
 	public BigDecimal getPostage() {
 		/* 537 */return this.postage;
