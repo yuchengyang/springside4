@@ -85,6 +85,9 @@ public class ProjectData extends IdEntity {
     @Transient
     private String ebuyMethod;
     
+	@Transient
+	private String prequalification;//
+    
 	@Column(name="project_id")
 	public String getProjectId() {
 		return projectId;
@@ -379,5 +382,14 @@ public class ProjectData extends IdEntity {
 			}
 		}
 		return synStatusCN;
+	}
+	
+	@Transient
+	public String getPrequalification() {
+		return prequalification;
+	}
+	
+	public void setPrequalification(String prequalification) {
+		this.prequalification = prequalification;
 	}
 }

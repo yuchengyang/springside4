@@ -6,7 +6,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "PRO_PROJECT_COMPANY")
-public class ProjectStepType{
+public class ProjectStepTypeView{
 	
 	private Long projectStepTypeId;
 	private String projectTypeId;

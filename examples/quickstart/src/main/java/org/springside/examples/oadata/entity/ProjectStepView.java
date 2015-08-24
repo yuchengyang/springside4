@@ -2,11 +2,12 @@ package org.springside.examples.oadata.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "PRO_PROJECT_STEP")
-public class ProjectStep{
+public class ProjectStepView{
 
 	private Long projectStepId;
 	private Long projectId;
@@ -18,6 +19,7 @@ public class ProjectStep{
 	private Boolean repeatFlag;
 	private Boolean isIntegrity;
 	
+	@Id
 	public Long getProjectStepId() {
 		return projectStepId;
 	}

@@ -11,8 +11,6 @@
 		<property name="triggers">
 			<list>
 				<ref bean="cronTrigger" />
-				<!-- <ref bean="cronProjectToZTBTrigger"/> -->
-				<ref bean="cronSupplierToZTBTrigger"/>
 			</list>
 		</property>
 		<!-- Quartz配置, 本地运行无需单独的quartz.properties文件，在此简单配置即可 -->
@@ -38,42 +36,8 @@
 			</bean>
 		</property>
 		<!-- 周一至五,朝九晚五工作时间内每半小时执行一次 -->
-		<property name="cronExpression" value="0 0/2 * ? * *" />
+		<property name="cronExpression" value="0 0 1 ? * *" />
 	</bean>
 	<!-- *************************从oa抓取数据***************************** -->
-	
-	<!-- *************************从local同步project数据到电子招标***************************** -->
-	<!-- Cron式Trigger定义 -->
-	<bean id="cronProjectToZTBTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-		<property name="jobDetail">
-			<!-- JobDetajil, 基于MethodInvokingJobDetailFactoryBean调用普通Spring Bean -->
-			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-				<property name="targetObject" ref="transferOaDataToGx" />
-				<property name="targetMethod" value="synProjectToZTB" />
-				<!-- 同一任务在前一次执行未完成而Trigger时间又到时是否并发开始新的执行, 默认为true. -->
-				<property name="concurrent" value="false" />
-			</bean>
-		</property>
-		<!-- 周一至五,朝九晚五工作时间内每半小时执行一次 -->
-		<property name="cronExpression" value="0 0/3 3-6 ? * MON-FRI" />
-	</bean>
-	<!-- *************************从local同步project数据到电子招标***************************** -->
-	
-	
-	<!-- *************************从local同步supplier数据到电子招标***************************** -->
-	<!-- Cron式Trigger定义 -->
-	<bean id="cronSupplierToZTBTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-		<property name="jobDetail">
-			<!-- JobDetajil, 基于MethodInvokingJobDetailFactoryBean调用普通Spring Bean -->
-			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-				<property name="targetObject" ref="transferOaDataToGx" />
-				<property name="targetMethod" value="synSupplierToZTB" />
-				<!-- 同一任务在前一次执行未完成而Trigger时间又到时是否并发开始新的执行, 默认为true. -->
-				<property name="concurrent" value="false" />
-			</bean>
-		</property>
-		<!-- 周一至五,朝九晚五工作时间内每半小时执行一次 -->
-		<property name="cronExpression" value="0 0/2 13-17 ? * MON-FRI" />
-	</bean>
-	<!-- *************************从local同步supplier数据到电子招标***************************** -->
+
 </beans>
