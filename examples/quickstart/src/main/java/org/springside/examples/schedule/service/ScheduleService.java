@@ -12,16 +12,22 @@ import java.util.List;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springside.examples.oadata.entity.BulletinView;
 import org.springside.examples.oadata.entity.BuyerView;
 import org.springside.examples.oadata.entity.ProjectPkgView;
 import org.springside.examples.oadata.entity.ProjectView;
+import org.springside.examples.oadata.entity.TenderView;
 import org.springside.examples.oadata.repository.BulletinViewDao;
 import org.springside.examples.oadata.repository.BuyerViewDao;
 import org.springside.examples.oadata.repository.ProjectViewDao;
+import org.springside.examples.oadata.repository.TenderViewDao;
+import org.springside.examples.oadata.service.TenderViewService;
 import org.springside.examples.quickstart.entity.BulletinData;
 import org.springside.examples.quickstart.entity.BuyerData;
 import org.springside.examples.quickstart.entity.ProjectData;
@@ -29,6 +35,9 @@ import org.springside.examples.quickstart.entity.ProjectPkgData;
 import org.springside.examples.quickstart.repository.BulletinDataDao;
 import org.springside.examples.quickstart.repository.BuyerDataDao;
 import org.springside.examples.quickstart.repository.ProjectDataDao;
+import org.springside.examples.quickstart.service.BuyerDataService;
+import org.springside.examples.quickstart.service.ProjectDataService;
+import org.springside.examples.schedule.bean.Result;
 
 
 // Spring Bean的标识.
@@ -36,7 +45,8 @@ import org.springside.examples.quickstart.repository.ProjectDataDao;
 // 类中所有public函数都纳入事务管理的标识.
 @Transactional
 public class ScheduleService {
-	
+	private static Logger logger = LoggerFactory.getLogger(ScheduleService.class);
+
 	static final int STEPJUMPBUYERNUM = 500;
 	static final int STEPJUMPPROJECTNUM = 2;
 	static final int STEPJUMPBULLETINNUM = 2;
@@ -53,6 +63,26 @@ public class ScheduleService {
 	
 	static Date backSynBulletinFromDate = null;
 
+	static ThreadPoolTaskExecutor poolTaskExecutor;
+	
+	
+	static {
+		try {
+			//初始化线程池
+			poolTaskExecutor = new ThreadPoolTaskExecutor();  
+			//线程池所使用的缓冲队列  
+			poolTaskExecutor.setQueueCapacity(200);  
+			//线程池维护线程的最少数量  
+			poolTaskExecutor.setCorePoolSize(5);  
+			//线程池维护线程的最大数量  
+			poolTaskExecutor.setMaxPoolSize(1000);  
+			//线程池维护线程所允许的空闲时间  
+			poolTaskExecutor.setKeepAliveSeconds(30000);  
+			poolTaskExecutor.initialize();  
+		} catch (Exception e) {
+			logger.error("初始化{}类错误:"+ ScheduleService.class.getName() + e.getStackTrace());
+		} 
+	}
 
 	@Autowired
 	private BulletinViewDao bulletinViewDao;
@@ -66,6 +96,17 @@ public class ScheduleService {
 	private BuyerViewDao buyerViewDao;
 	@Autowired
 	private BuyerDataDao buyerDataDao;
+	@Autowired
+	private BuyerDataService buyerDataService;
+	@Autowired
+	private ProjectDataService projectDataService;
+	
+	@Autowired
+	TenderViewDao tenderViewDao;
+	
+	@Autowired
+	TenderViewService tenderViewService;
+	
 	
 	public void updateGetedBulletin() throws Exception {
 		//选出最大的发公告时间,也就是 已更新至XX时间
@@ -147,7 +188,7 @@ public class ScheduleService {
 				//回溯时间-7  至  回溯时间 内的项目（oa）
 				List<ProjectView> oaProjectViews = projectViewDao.getProjectViewFromToTime( DateUtils.addDays( backSynProjectFromDate , -7 ), backSynProjectFromDate);
 				//回溯时间-7  至  回溯时间 内的项目（local）
-				List<ProjectData> localProjectDatas = projectDataDao.getProjectViewFromToTime( DateUtils.addDays( backSynProjectFromDate , -7 ), backSynProjectFromDate);
+				List<ProjectData> localProjectDatas = projectDataDao.getProjectDateFromToTime( DateUtils.addDays( backSynProjectFromDate , -7 ), backSynProjectFromDate);
 				
 				//不存在于local 中
 				List<ProjectView> notInLocalProjectViews = new ArrayList<ProjectView>();
@@ -314,5 +355,72 @@ public class ScheduleService {
 		}else{
 			stepJumpBuyer = STEPJUMPBUYERNUM;
 		}
+	}
+	
+	static Date synProjectfromDate =  null; 
+	public void synProjectToZTB(){
+		if(synProjectfromDate == null){
+			synProjectfromDate = DateUtils.addDays(projectDataDao.findMinSynDate() , -1 );
+		}
+		if(synProjectfromDate.after(new Date())){
+			synProjectfromDate = DateUtils.addDays(new Date(), -1);
+		}
+		Date synToDate = DateUtils.addDays(synProjectfromDate, 30 );
+		
+		List<ProjectData> projectDatas = projectDataDao.getSynProjectDateFromToTime(synProjectfromDate, synToDate);
+
+		try {
+			int count = 0;
+			System.out.println("本次更新从"+synProjectfromDate+"至"+synToDate);
+			for(ProjectData projectData : projectDatas){
+				if(projectData.getSynStatus() < ProjectData.SYNSTATUS_BASEINFO_SUCCESS){
+					try {
+						//同步采购人信息
+						buyerDataService.synBuyerProccess(projectData);
+						//同步项目信息
+						if( projectDataService.synProjectProccess(projectData) ) {
+							count++;
+						}
+					} catch (Exception e) {
+						logger.error(e.getMessage());
+					}
+				}
+			}
+			logger.info("from {} to {} updateProjectNumber：{} ", synProjectfromDate, synToDate , count );
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		synProjectfromDate =  synToDate ;
+	}
+	
+	static Long synSupplierfromId =  null; 
+	public void synSupplierToZTB(){
+		if(synSupplierfromId == null){
+			synSupplierfromId =  tenderViewDao.findMinId4Syn()-1; 
+		}
+		Long maxId = tenderViewDao.findMaxId4Syn();
+		if(synSupplierfromId  >=maxId ){
+			synSupplierfromId = maxId;
+		}
+		Long synSupplierToId = synSupplierfromId + 500;
+		
+		List<TenderView> tenderViews = tenderViewDao.getSynTenderViewFromTo(synSupplierfromId, synSupplierToId);
+		try {
+			int count = 0;
+			for(TenderView tenderView : tenderViews){
+					try {
+						Result result  = tenderViewService.synTenderProccess(tenderView);
+						if(result.isSuccess()){
+							count++;
+						}
+					} catch (Exception e) {
+						logger.error(e.getMessage());
+					}
+			}
+			System.out.println("本次更新从"+synSupplierfromId+"至"+synSupplierToId+"共更新投标人："+count +"个");
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		synSupplierfromId =  synSupplierToId ;
 	}
 }

@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springside.examples.quickstart.service.ProjectDataService;
 import org.springside.examples.schedule.service.ScheduleService;
 
 @Component
@@ -37,6 +38,9 @@ public class TransferOaDataToGx {
 
 	@Autowired
 	private ScheduleService scheduleService;
+	
+	@Autowired
+	private ProjectDataService projectDataService;
 	
 	/**从oa抓取数据*/
 	public void getDataFromOA() {
@@ -48,6 +52,24 @@ public class TransferOaDataToGx {
 			//处理项目
 			scheduleService.updateGetedProject();
 
+		} catch (Exception e) {
+			logger.error("抓取数据出现异常" + e.getMessage() );
+		}
+	}
+	
+	/**抓取项目数据送到ZTB*/
+	public void synProjectToZTB(){
+		try {
+			scheduleService.synProjectToZTB();
+		} catch (Exception e) {
+			logger.error("抓取数据出现异常" + e.getMessage() );
+		}
+	}
+	
+	/**抓取投标人数据送到ZTB*/
+	public void synSupplierToZTB(){
+		try {
+			scheduleService.synSupplierToZTB();
 		} catch (Exception e) {
 			logger.error("抓取数据出现异常" + e.getMessage() );
 		}

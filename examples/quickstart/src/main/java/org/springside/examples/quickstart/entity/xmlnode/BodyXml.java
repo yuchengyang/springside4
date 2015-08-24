@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 import org.springside.examples.oadata.entity.ProjectRuleView;
+import org.springside.examples.oadata.entity.TenderView;
 import org.springside.examples.quickstart.entity.BulletinData;
 import org.springside.examples.quickstart.entity.BuyerData;
 import org.springside.examples.quickstart.entity.ProjectData;
@@ -23,7 +24,7 @@ import org.springside.examples.quickstart.entity.ProjectData;
  */
 // JPA 基类的标识
 @XmlRootElement(name="body" )
-@XmlSeeAlso({ProjectData.class, BulletinData.class , ProjectRuleView.class })
+@XmlSeeAlso({ProjectData.class, BulletinData.class , ProjectRuleView.class , TenderView.class })
 public class BodyXml<T> {
 	
 	private BuyerData buyerInfo;

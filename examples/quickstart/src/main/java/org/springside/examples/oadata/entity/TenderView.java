@@ -3,7 +3,11 @@ package org.springside.examples.oadata.entity;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
 
+
+
+@XmlRootElement(name="supplierInfo")
 @Entity
 @Table(name = "RES_TENDER")
 public class TenderView {

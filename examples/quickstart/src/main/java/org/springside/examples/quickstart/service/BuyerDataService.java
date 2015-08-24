@@ -239,4 +239,9 @@ public class BuyerDataService {
 		}
 		return result;
 	}
+
+	public String getBuyerDataName(String delegateCompany) {
+		BuyerData buyerData = buyerDataDao.findOne(Long.parseLong(delegateCompany));
+		return buyerData!=null ?buyerData.getCustomerName():null;
+	}
 }
