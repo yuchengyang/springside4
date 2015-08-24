@@ -73,8 +73,8 @@ public class ProjectDataService {
 			httpClient = HttpClientBuilder.create().setMaxConnTotal(20).setMaxConnPerRoute(20).setDefaultRequestConfig(requestConfig).build();
 			
 		} catch (JAXBException e) {
-			logger.error("初始化{}类错误:"+ BuyerDataService.class.getName() + e.getStackTrace());
-		}  
+			logger.error("初始化{}类错误:"+ ProjectDataService.class.getName() + e.getStackTrace());
+		} 
 	}
 	
 	@Autowired
@@ -159,7 +159,7 @@ public class ProjectDataService {
 			}
 			if(ProjectData.SYNSTATUS_BUYERINFO_SUCCESS  ==  projectData.getSynStatus()  ){
 				//同步项目
-				result = result | sysProjectProccess( projectData );
+				result = result | synProjectProccess( projectData );
 			}
 			if(ProjectData.SYNSTATUS_BASEINFO_SUCCESS == projectData.getSynStatus() ){
 				//同步招标文件
@@ -176,7 +176,12 @@ public class ProjectDataService {
 		return resultreturn;
 	}
 	
-	public boolean sysProjectProccess( ProjectData projectData){
+	public boolean synProjectProccess( ProjectData projectData){
+		
+		if( projectData.getDelegateCompany()!= null && projectData.getDelegateCompanyName() == null ){//冗余采购人名称
+			projectData.setDelegateCompanyName(buyerDataService.getBuyerDataName( projectData.getDelegateCompany() ));
+		}
+		
 		boolean result = false;
 		//发送
         StringWriter writer = new StringWriter();  
@@ -191,15 +196,17 @@ public class ProjectDataService {
         try {
 			marshaller.marshal(projectXml, writer);
 		} catch (JAXBException e) {
-			logger.error("采购项目{}|{}XML对象转换错误:"+e.getStackTrace(), projectData.getId() , projectData.getProjectName() );
+			logger.error("project {}|{} XML convert error:", projectData.getId() , projectData.getProjectCode() );
 		}  
 		try {
 			
 			HttpPost httpPost = new HttpPost( propertiesLoader.getProperty("syn.synProjectUrl") );
             // 创建名/值组列表  
             List<NameValuePair> parameters = new ArrayList<NameValuePair>();  
-
-            parameters.add(new BasicNameValuePair( "xmlContent", writer.toString() ));  
+            
+            String xmlContent = writer.toString();
+            
+            parameters.add(new BasicNameValuePair( "xmlContent",xmlContent ));  
             // 创建UrlEncodedFormEntity对象  
             UrlEncodedFormEntity formEntiry = new UrlEncodedFormEntity( parameters , "UTF-8");  
             httpPost.setEntity(formEntiry); 
@@ -216,15 +223,16 @@ public class ProjectDataService {
 					projectDataDao.save( projectData );
 					result = true;
 				}else{
-					logger.error("采购项目【{}|{}】同步失败！", projectData.getId() , projectData.getProjectName());
+					logger.error("project[{}|{}] update failed！", projectData.getId() , projectData.getProjectCode());
 				}
 			}
 			closeableHttpResponse.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-			logger.error("采购项目【{}|{}】同步接口连接错误:"+e.getStackTrace(),projectData.getId() , projectData.getProjectName());
+			logger.error("project[{}|{}] connect error :",projectData.getId() , projectData.getProjectCode());
 		}
 		return result;
 	}
+	
 
 }

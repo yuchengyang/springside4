@@ -17,6 +17,9 @@ public interface ProjectDataDao extends PagingAndSortingRepository<ProjectData, 
 
 	@Query("SELECT max( delegateDate ) FROM ProjectData")
 	Date findMaxDelegateDate();
+	
+	@Query("SELECT min( delegateDate ) FROM ProjectData")
+	Date findMinDelegateDate();
 
 	@Query("SELECT count(1) FROM ProjectData as project where project.useStatus=1 and project.delegateDate < ?1")
 	Long countBeforeDate(Date date);
@@ -28,5 +31,12 @@ public interface ProjectDataDao extends PagingAndSortingRepository<ProjectData, 
 	ProjectData getProject(String projectId);
 	
 	@Query("from ProjectData as project  where project.useStatus=1 and project.delegateDate > ?1 and project.delegateDate <= ?2 ")
-	List<ProjectData> getProjectViewFromToTime(Date from, Date to);
+	List<ProjectData> getProjectDateFromToTime(Date from, Date to);
+	
+	@Query("from ProjectData as project  where project.useStatus=1 and project.delegateDate > ?1 and project.delegateDate <= ?2  and project.synStatus <2 and project.projType = 'm' ")
+	List<ProjectData> getSynProjectDateFromToTime(Date from, Date to);
+	
+	
+	@Query("SELECT min( delegateDate ) FROM ProjectData where synStatus < 2 and projType = 'm' ")
+	Date findMinSynDate();
 }

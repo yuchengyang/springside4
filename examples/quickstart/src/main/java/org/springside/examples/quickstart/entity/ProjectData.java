@@ -21,6 +21,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import com.google.common.collect.Lists;
 
@@ -60,8 +61,12 @@ public class ProjectData extends IdEntity {
     private String organizationName;//organization_name-- `招标部门`,
     private String departmentId;// DEPARTMENT_ID-- 缺少 招标部门代码
     private String delegateCompany;//DELEGATE_COMPANY -- 缺少 委托单位
-	private String customerCorporate;//rc.CUSTOMER_CORPORATE,	--  预算单位联系人
-	private String customerTelephone;//   rc.CUSTOMER_TELEPHONE,预算单位联系电话
+    
+    private String delegateCompanyName;//DELEGATE_COMPANY -- 缺少 委托单位
+
+    
+	private String customerCorporate = "";//rc.CUSTOMER_CORPORATE,	--  预算单位联系人
+	private String customerTelephone = "";//   rc.CUSTOMER_TELEPHONE,预算单位联系电话
     private Date delegateDate;//DELEGATE_DATE   decimal(18)-- 缺少 立项日期
     private BigDecimal delegateAmount;//DELEGATE_AMOUNT-- 缺少 项目投资规模
     private String creatorName;//         creator_name    AS `项目经理`,
@@ -199,10 +204,19 @@ public class ProjectData extends IdEntity {
 	public String getDelegateCompany() {
 		return delegateCompany;
 	}
+	
 	public void setDelegateCompany(String delegateCompany) {
 		this.delegateCompany = delegateCompany;
 	}
 	
+	@XmlElement(name="buyerName")
+	@Transient
+	public String getDelegateCompanyName() {
+		return delegateCompanyName;
+	}
+	public void setDelegateCompanyName(String delegateCompanyName) {
+		this.delegateCompanyName = delegateCompanyName;
+	}
 	@XmlElement(name="createDate")
 	@Transient
 	public Date getCreateDate() {
@@ -218,6 +232,11 @@ public class ProjectData extends IdEntity {
 		this.delegateDate = delegateDate;
 	}
 	@XmlElement(name="totalBudget")
+	@Transient
+	public BigDecimal getTotalBudget() {
+		return getDelegateAmount()!=null ? getDelegateAmount():new BigDecimal(0);
+	}
+	
 	@Column(name="DELEGATE_AMOUNT")
 	public BigDecimal getDelegateAmount() {
 		return delegateAmount;
@@ -242,7 +261,13 @@ public class ProjectData extends IdEntity {
 	}
 	
 	@XmlElement(name="buyerLinkerName")
-	@Column(name="CUSTOMER_CORPORATE")
+	@Transient
+	public String getBuyerLinkerName() {
+		return getCustomerCorporate()!=null ?getCustomerCorporate():"";
+	}
+	
+	
+	@Column(name="CUSTOMER_CORPORATE" )
 	public String getCustomerCorporate() {
 		return customerCorporate;
 	}
@@ -250,7 +275,12 @@ public class ProjectData extends IdEntity {
 		this.customerCorporate = customerCorporate;
 	}
 	
-	@XmlElement(name="buyerLinkerPhone")
+	@XmlElement(name="buyerLinkerPhone"  )
+	@Transient
+	public String getBuyerLinkerPhone() {
+		return getCustomerTelephone()!=null ?getCustomerTelephone():"";
+	}
+	
 	@Column(name="CUSTOMER_TELEPHONE")
 	public String getCustomerTelephone() {
 		return customerTelephone;
@@ -296,8 +326,7 @@ public class ProjectData extends IdEntity {
 		this.projType = projType;
 	}
 
-	//@XmlTransient
-	@XmlElement
+	@XmlTransient
 	@OneToMany(mappedBy = "parentProject")
 	public List<ProjectPkgData> getProjectPkgDatas() {
 		return projectPkgDatas;
