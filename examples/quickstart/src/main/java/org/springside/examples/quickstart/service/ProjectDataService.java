@@ -185,7 +185,7 @@ public class ProjectDataService {
 		if( projectData.getDelegateCompany()!= null && projectData.getDelegateCompanyName() == null ){//冗余采购人名称
 			projectData.setDelegateCompanyName(buyerDataService.getBuyerDataName( projectData.getDelegateCompany() ));
 		}
-		Integer prequalificationCountInteger =  projectStepViewDao.prequalificationCount(Long.parseLong(projectData.getProjectId()));
+		Long prequalificationCountInteger =  projectStepViewDao.prequalificationCount(Long.parseLong(projectData.getProjectId()));
 		projectData.setPrequalification(prequalificationCountInteger!=null && prequalificationCountInteger > 0 ?"1":"0");
 		
 		boolean result = false;

@@ -13,6 +13,6 @@ import org.springside.examples.oadata.entity.ProjectStepView;
 
 public interface ProjectStepViewDao extends PagingAndSortingRepository<ProjectStepView, Long>, JpaSpecificationExecutor<ProjectStepView> {
 
-	@Query("FROM ProjectStepView where projectId = ?1 projectStepTypeId in (3,4,5) ")
-	Integer prequalificationCount(long projectId );
+	@Query(" select count(1) FROM ProjectStepView where projectId = ?1 and projectStepTypeId in (3,4,5) ")
+	Long prequalificationCount(long projectId );
 }
