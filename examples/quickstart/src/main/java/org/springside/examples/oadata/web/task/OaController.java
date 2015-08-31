@@ -23,9 +23,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springside.examples.oadata.entity.ApplyCompanyView;
 import org.springside.examples.oadata.entity.ProjectDocView;
+import org.springside.examples.oadata.entity.ProjectStepTypeView;
 import org.springside.examples.oadata.entity.TenderView;
 import org.springside.examples.oadata.repository.AppCompanyViewDao;
 import org.springside.examples.oadata.repository.ProjectDocViewDao;
+import org.springside.examples.oadata.repository.ProjectStepTypeViewDao;
 import org.springside.examples.oadata.repository.TenderViewDao;
 import org.springside.examples.quickstart.entity.ProjectData;
 import org.springside.examples.quickstart.repository.ProjectDataDao;
@@ -70,9 +72,20 @@ public class OaController {
 	@Autowired
 	ProjectDocViewDao projectDocViewDao;
 	
+	@Autowired
+	ProjectStepTypeViewDao projectStepTypeViewDao;
+	
 	@RequestMapping(value = "getProjectDetail" , method = RequestMethod.GET)
 	public String getProjectDetail(Model model,HttpServletRequest request , @RequestParam(value = "projectId") String projectId) {
 		ProjectData projectData = projectDataDao.getProject(projectId);
+		
+		model.addAttribute("projectStepTypeViews", projectStepTypeViewDao.getStep(Long.parseLong(projectId)));
+		
+		List<ProjectStepTypeView> lastedProjectStepTypeViews = projectStepTypeViewDao.getLastedStep(Long.parseLong(projectId) );
+		List<ProjectStepTypeView> activeProjectStepTypeViews = projectStepTypeViewDao.getActivStep(Long.parseLong(projectId) );
+		model.addAttribute("lastedProjectStepTypeView", lastedProjectStepTypeViews!=null && lastedProjectStepTypeViews.size()>0 ? lastedProjectStepTypeViews.get(0):null);
+		model.addAttribute("activeProjectStepTypeView", activeProjectStepTypeViews!=null && activeProjectStepTypeViews.size()>0 ? activeProjectStepTypeViews.get(0):null);
+
 		model.addAttribute("projectData", projectData);
 		
 		List<ProjectDocView>  projectDocViews = projectDocViewDao.queryProjectDocView(projectId);

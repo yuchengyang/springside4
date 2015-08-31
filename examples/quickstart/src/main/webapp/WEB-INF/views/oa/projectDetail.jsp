@@ -19,7 +19,42 @@
 				<label class="control-label">项目名称:</label>
 				<div class="controls">${projectData.projectName}</div>
 			</div>
+			<div class="control-group">
+				<label class="control-label">项目创建时间:</label>
+				<div class="controls">${projectData.delegateDate}</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">项目当前节点:</label>
+				<div class="controls">${activeProjectStepTypeView.projectStepTypeName}</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">项目上个节点:</label>
+				<div class="controls">${lastedProjectStepTypeView.projectStepTypeName}</div>
+			</div>
+			
+			
+			
 		</fieldset>
+		
+		<c:if test="${ not empty projectStepTypeViews }">
+		<fieldset>
+			<legend><small>项目节点</small></legend>
+			<div>
+						<table id="contentTable" class="table table-striped table-bordered table-condensed">
+						<thead><tr>
+						<th>节点名称</th>
+						</tr></thead>
+						<tbody>
+						<c:forEach items="${projectStepTypeViews}" var="projectStepTypeView">
+							<tr>
+								<td>${projectStepTypeView.projectStepTypeName}</td>
+							</tr>
+						</c:forEach>
+						</tbody>
+						</table>
+			</div>
+		</fieldset>
+		</c:if>
 		
 		<c:if test="${not empty projectData.projectPkgDatas  }">
 		<fieldset>

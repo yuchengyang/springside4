@@ -15,4 +15,7 @@ public interface ProjectStepViewDao extends PagingAndSortingRepository<ProjectSt
 
 	@Query(" select count(1) FROM ProjectStepView where projectId = ?1 and projectStepTypeId in (3,4,5) ")
 	Long prequalificationCount(long projectId );
+	
+	
+	
 }

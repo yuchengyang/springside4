@@ -5,7 +5,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "PRO_PROJECT_COMPANY")
+@Table(name = "PRO_PROJECT_STEP_TYPE")
 public class ProjectStepTypeView{
 	
 	private Long projectStepTypeId;
