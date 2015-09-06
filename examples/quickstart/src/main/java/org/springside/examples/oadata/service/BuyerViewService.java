@@ -8,6 +8,7 @@ package org.springside.examples.oadata.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springside.examples.oadata.entity.BuyerView;
 import org.springside.examples.oadata.repository.BuyerViewDao;
 
 
@@ -18,4 +19,9 @@ import org.springside.examples.oadata.repository.BuyerViewDao;
 public class BuyerViewService {
 	@Autowired
 	private BuyerViewDao buyerViewDao;
+	
+	public String getBuyerViewName(String delegateCompany) {
+		BuyerView buyerView = buyerViewDao.findOne(delegateCompany);
+		return buyerView!=null ?buyerView.getCustomerName():null;
+	}
 }
