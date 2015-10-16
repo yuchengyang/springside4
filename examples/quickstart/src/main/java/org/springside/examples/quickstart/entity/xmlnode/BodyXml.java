@@ -8,10 +8,10 @@ package org.springside.examples.quickstart.entity.xmlnode;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
+import org.springside.examples.oadata.entity.BuyerView;
 import org.springside.examples.oadata.entity.ProjectRuleView;
 import org.springside.examples.oadata.entity.TenderView;
 import org.springside.examples.quickstart.entity.BulletinData;
-import org.springside.examples.quickstart.entity.BuyerData;
 import org.springside.examples.quickstart.entity.ProjectData;
 
 /**
@@ -27,15 +27,15 @@ import org.springside.examples.quickstart.entity.ProjectData;
 @XmlSeeAlso({ProjectData.class, BulletinData.class , ProjectRuleView.class , TenderView.class })
 public class BodyXml<T> {
 	
-	private BuyerData buyerInfo;
+	private BuyerView buyerInfo;
 	
 	private T projectInfo;
 	
-	public BuyerData getBuyerInfo() {
+	public BuyerView getBuyerInfo() {
 		return buyerInfo;
 	}
 
-	public void setBuyerInfo(BuyerData buyerInfo) {
+	public void setBuyerInfo(BuyerView buyerInfo) {
 		this.buyerInfo = buyerInfo;
 	}
 

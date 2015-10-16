@@ -99,20 +99,22 @@ public class OaController {
 	}
 	
 	@RequestMapping(value = "getProjectFile" , method = RequestMethod.GET)
-	public String getProjectFile(Model model,HttpServletRequest request ,HttpServletResponse resp,  @RequestParam(value = "filePath") String filePath ) {
+	public String getProjectFile(Model model,HttpServletRequest request ,HttpServletResponse resp,  @RequestParam(value = "fileId") Long fileId ) {
         ContinueFTP myFtp = new ContinueFTP();
         InputStream in  = null;
         OutputStream os = null;
         byte[] attachment = null;
         try {
+    		ProjectDocView projectDocView = projectDocViewDao.findOne(fileId);
+
    			myFtp.connect(
    					propertiesLoader.getProperty("oa.ftp.url"), 
    					Integer.parseInt( propertiesLoader.getProperty("oa.ftp.port")),
    					propertiesLoader.getProperty("oa.ftp.username"),
    					propertiesLoader.getProperty("oa.ftp.password"));
-   			String path = propertiesLoader.getProperty("oa.ftp.resUploadFilePath") + filePath;
-   			logger.info("path:{} ,name:{}" ,path ,filePath);
-   			in = myFtp.download( path , filePath);
+   			String path = propertiesLoader.getProperty("oa.ftp.resUploadFilePath") + projectDocView.getAttachmentPath();
+   			logger.info("path:{} ,name:{}" ,path ,projectDocView.getAttachmentPath());
+   			in = myFtp.download( path , projectDocView.getAttachmentPath());
             if(in!=null){
             	int len = in.available();
 	        		attachment = new byte[len];
@@ -120,10 +122,11 @@ public class OaController {
             	}
             os = resp.getOutputStream();
             
-            Servlets.setFileDownloadHeader(request, resp, filePath);;
+            Servlets.setFileDownloadHeader(request, resp, projectDocView.getAttachmentPath());;
             
             os.write( attachment );
             os.close();
+    		logger.info("filePath："+projectDocView.getAttachmentPath()+ "获取文件size：" + ( attachment!= null ? attachment.length : 0 ));
    		} catch (IOException e) {
    				e.printStackTrace();
    				logger.error("连接FTP时出错");
@@ -134,8 +137,6 @@ public class OaController {
    				logger.error("断开FTP时IO异常");
    			}
    		}
-		logger.info("filePath："+filePath+ "获取文件size：" + ( attachment!= null ? attachment.length : 0 ));
 		return null;
 	}
-	
 }

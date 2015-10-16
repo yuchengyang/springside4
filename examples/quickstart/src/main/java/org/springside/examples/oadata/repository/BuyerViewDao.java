@@ -13,7 +13,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springside.examples.oadata.entity.BuyerView;
 
 
-public interface BuyerViewDao extends PagingAndSortingRepository<BuyerView, String>, JpaSpecificationExecutor<BuyerView> {
+public interface BuyerViewDao extends PagingAndSortingRepository<BuyerView, Integer>, JpaSpecificationExecutor<BuyerView> {
 
 	@Query("from BuyerView where customerId > ?1 and customerId < ?2")
 	List<BuyerView> getBuyerViewFromToID(Integer from, Integer to);

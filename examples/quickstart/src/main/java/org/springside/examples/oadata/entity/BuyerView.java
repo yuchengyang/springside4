@@ -9,6 +9,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * 统一定义id的entity基类.
@@ -19,6 +22,7 @@ import javax.persistence.Table;
  * @author calvin
  */
 // JPA 基类的标识
+@XmlRootElement(name="buyerInfo")
 @Entity
 @Table(name = "view_oa_service_customer")
 public class BuyerView {
@@ -33,6 +37,10 @@ public class BuyerView {
 	private String customerFax;// -- CUSTOMER_FAX传真*/
 	private String customerTelephone;//CUSTOMER_TELEPHONE 电话
 	
+	@Transient
+	private String buyerCode;
+	
+	@XmlElement (name="buyerId")
 	@Id
 	public int getCustomerId() {
 		return customerId;
@@ -41,6 +49,7 @@ public class BuyerView {
 		this.customerId = customerId;
 	}
 	
+	@XmlElement (name="buyerName")
 	@Column(name="customer_name")
 	public String getCustomerName() {
 		return customerName;
@@ -55,6 +64,8 @@ public class BuyerView {
 	public void setCustomerParentorganization(String customerParentorganization) {
 		this.customerParentorganization = customerParentorganization;
 	}
+	
+	@XmlElement (name="belongIndustry")
 	@Column(name="customer_industry")
 	public String getCustomerIndustry() {
 		return customerIndustry;
@@ -62,6 +73,8 @@ public class BuyerView {
 	public void setCustomerIndustry(String customerIndustry) {
 		this.customerIndustry = customerIndustry;
 	}
+	
+	@XmlElement (name="email")
 	@Column(name="customer_mail")
 	public String getCustomerMail() {
 		return customerMail;
@@ -69,6 +82,8 @@ public class BuyerView {
 	public void setCustomerMail(String customerMail) {
 		this.customerMail = customerMail;
 	}
+	
+	@XmlElement (name="address")
 	@Column(name="customer_address")
 	public String getCustomerAddress() {
 		return customerAddress;
@@ -76,6 +91,8 @@ public class BuyerView {
 	public void setCustomerAddress(String customerAddress) {
 		this.customerAddress = customerAddress;
 	}
+	
+	@XmlElement (name="postCode")
 	@Column(name="customer_post_no")
 	public String getCustomerPostno() {
 		return customerPostno;
@@ -83,6 +100,8 @@ public class BuyerView {
 	public void setCustomerPostno(String customerPostno) {
 		this.customerPostno = customerPostno;
 	}
+	
+	@XmlElement (name="fax")
 	@Column(name="CUSTOMER_FAX")
 	public String getCustomerFax() {
 		return customerFax;
@@ -90,13 +109,20 @@ public class BuyerView {
 	public void setCustomerFax(String customerFax) {
 		this.customerFax = customerFax;
 	}
-	
+
+	@XmlElement (name="telephone")
 	@Column(name="CUSTOMER_TELEPHONE")
 	public String getCustomerTelephone() {
 		return customerTelephone;
 	}
+	
 	public void setCustomerTelephone(String customerTelephone) {
 		this.customerTelephone = customerTelephone;
 	}
 	
+	@Transient
+	@XmlElement (name="buyerCode")
+	public String getBuyerCode() {
+		return "OA_"+customerId;
+	}
 }

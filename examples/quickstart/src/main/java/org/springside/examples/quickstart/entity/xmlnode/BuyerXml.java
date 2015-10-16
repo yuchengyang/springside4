@@ -7,7 +7,7 @@ package org.springside.examples.quickstart.entity.xmlnode;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.springside.examples.quickstart.entity.BuyerData;
+import org.springside.examples.oadata.entity.BuyerView;
 
 /**
  * 统一定义id的entity基类.
@@ -21,12 +21,12 @@ import org.springside.examples.quickstart.entity.BuyerData;
 @XmlRootElement(name="buyer")
 public class BuyerXml {
 	
-	private BodyXml<BuyerData> body;
+	private BodyXml<BuyerView> body;
 
-	public BodyXml<BuyerData> getBody() {
+	public BodyXml<BuyerView> getBody() {
 		return body;
 	}
-	public void setBody(BodyXml<BuyerData> body) {
+	public void setBody(BodyXml<BuyerView> body) {
 		this.body = body;
 	}
 }

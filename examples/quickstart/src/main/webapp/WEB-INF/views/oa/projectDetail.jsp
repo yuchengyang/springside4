@@ -88,7 +88,7 @@
 					<tbody>
 					<c:forEach items="${projectDocViews}" var="projectDocView">
 						<tr>
-							<td><a href="${ctx}/oa/getProjectFile?filePath=${projectDocView.attachmentPath}">${projectDocView.attachmentName}</a></td>
+							<td><a href="${ctx}/oa/getProjectFile?fileId=${projectDocView.projectAttachmentId}">${projectDocView.attachmentName}</a></td>
 							<td>${projectDocView.uploadDate}</td>
 						</tr>
 					</c:forEach>

@@ -36,13 +36,18 @@ SELECT
 	else 's'
 	 end) as proj_type 
    , pbs.PROJECT_ID as PROJECT_parent_id-- 父级项目
+   , pdpp.XYGH_FLAG -- xyghstatus 
 FROM
 	`report_project` `r` 
 left join res_customer rc on rc.CUSTOMER_ID = `r`.DELEGATE_COMPANY
 LEFT join pro_bid_section pbs on `r`.PROJECT_ID = pbs.PROJECT_ID
 , pro_project   pp 
+, pro_bid_project pdpp 
 WHERE
  `r`.PROJECT_ID = pp.PROJECT_ID 
+ and `r`.PROJECT_ID = pdpp.BID_PROJECT_ID
+and pdpp.XYGH_FLAG = 1 
+
 and `r`.`finished_approval` = 1
 AND `r`.`project_type_id` IN('BID', 'PROCUREMENT')
 -- AND `r`.`organization_type` = 3
@@ -83,11 +88,15 @@ UNION all
    ,r.CREATOR -- AS `项目经理id`,
 	,'m'as proj_type 
    , null as PROJECT_parent_id -- 父级项目
+   , pdpp.XYGH_FLAG -- xyghstatus 
    from report_project r 
 	left join res_customer rc on rc.CUSTOMER_ID = r.DELEGATE_COMPANY
 , pro_project   pp 
+, pro_bid_project pdpp 
 where 	
  `r`.PROJECT_ID = pp.PROJECT_ID 
+  and `r`.PROJECT_ID = pdpp.BID_PROJECT_ID
+and pdpp.XYGH_FLAG = 1 
 and r.`finished_approval` = 1
 AND r.`project_type_id` IN('BID', 'PROCUREMENT')
 -- AND r.`organization_type` = 3

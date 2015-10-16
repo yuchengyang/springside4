@@ -21,7 +21,7 @@ public class BuyerViewService {
 	private BuyerViewDao buyerViewDao;
 	
 	public String getBuyerViewName(String delegateCompany) {
-		BuyerView buyerView = buyerViewDao.findOne(delegateCompany);
+		BuyerView buyerView = buyerViewDao.findOne(Integer.parseInt(delegateCompany));
 		return buyerView!=null ?buyerView.getCustomerName():null;
 	}
 }

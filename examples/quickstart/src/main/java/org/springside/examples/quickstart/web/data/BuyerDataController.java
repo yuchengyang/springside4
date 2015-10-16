@@ -5,7 +5,6 @@
  *******************************************************************************/
 package org.springside.examples.quickstart.web.data;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
@@ -17,7 +16,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springside.examples.quickstart.entity.BuyerData;
 import org.springside.examples.quickstart.service.BuyerDataService;
 import org.springside.modules.web.Servlets;
@@ -69,14 +67,14 @@ public class BuyerDataController {
 		return "buyer/buyerList";
 	}
 	
-	@RequestMapping(value = "synBuyer", method = RequestMethod.POST)
+/*	@RequestMapping(value = "synBuyer", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> synBuyer(final @RequestParam(value = "ids[]")Long... ids) {
+	public Map<String, Object> synBuyer(final @RequestParam(value = "ids[]")Integer... ids) {
 		return new HashMap<String, Object>(){
 			private static final long serialVersionUID = 1L;
 			{
 				put("success", buyerDataService.synBuyer(ids));
 			}
 		};
-	}	
+	}*/	
 }

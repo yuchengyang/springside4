@@ -300,7 +300,13 @@ public class ProjectData extends IdEntity {
 		}else if("1".equals(getProjectSecretlevel())){
 			ebuyMethod = "00";
 		}else{
-			ebuyMethod = "00";//其他走公开招标 TODO 
+			ebuyMethod = "01";//其他走邀请招标 TODO 
+			/**
+			 * 鱼的天空  14:53:44
+				为 null 的都是 邀请是吧 ？
+				朱红乐  14:53:53
+				对
+			 */
 		}
 		return ebuyMethod;
 	}
