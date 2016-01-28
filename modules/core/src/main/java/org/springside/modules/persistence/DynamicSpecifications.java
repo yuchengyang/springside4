@@ -57,6 +57,15 @@ public class DynamicSpecifications {
 						case LTE:
 							predicates.add(builder.lessThanOrEqualTo(expression, (Comparable) filter.value));
 							break;
+						case IN:{
+						        List<Predicate> orPredicates = Lists.newArrayList();
+								for(String string : ( String[])filter.value){
+									Predicate p = builder.equal(expression, string );
+									orPredicates.add(builder.or(p));
+								}
+								predicates.add(builder.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+								break;
+							}
 						}
 					}
 

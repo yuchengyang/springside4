@@ -1,4 +1,6 @@
 CREATE OR REPLACE VIEW view_oa_service_projectinfo AS 
+
+
 SELECT
 	(case when  ISNULL( pbs.BID_SECTION_ID )= 1 then `r`.`project_id` else concat ( 'S_',pbs.BID_SECTION_ID)  end) AS project_id  , -- `项目id`,
 	(case when  ISNULL( pbs.BID_SECTION_ID )= 1 then `r`.PROJECT_CODE else pbs.BID_SECTION_CODE end) AS project_code,	
@@ -36,7 +38,9 @@ SELECT
 	else 's'
 	 end) as proj_type 
    , pbs.PROJECT_ID as PROJECT_parent_id-- 父级项目
-   , pdpp.XYGH_FLAG -- xyghstatus 
+      , pdpp.XYGH_FLAG -- xyghstatus 
+   , pdpp.IS_BID_EID -- xyghstatus 
+
 FROM
 	`report_project` `r` 
 left join res_customer rc on rc.CUSTOMER_ID = `r`.DELEGATE_COMPANY
@@ -46,7 +50,7 @@ LEFT join pro_bid_section pbs on `r`.PROJECT_ID = pbs.PROJECT_ID
 WHERE
  `r`.PROJECT_ID = pp.PROJECT_ID 
  and `r`.PROJECT_ID = pdpp.BID_PROJECT_ID
-and pdpp.XYGH_FLAG = 1 
+and ( (pdpp.XYGH_FLAG = 1 and pdpp.IS_BID_EID is null) or pdpp.IS_BID_EID = 1  or pp.IS_EBID = 1 )
 
 and `r`.`finished_approval` = 1
 AND `r`.`project_type_id` IN('BID', 'PROCUREMENT')
@@ -88,7 +92,9 @@ UNION all
    ,r.CREATOR -- AS `项目经理id`,
 	,'m'as proj_type 
    , null as PROJECT_parent_id -- 父级项目
-   , pdpp.XYGH_FLAG -- xyghstatus 
+      , pdpp.XYGH_FLAG -- xyghstatus 
+   , pdpp.IS_BID_EID -- xyghstatus 
+
    from report_project r 
 	left join res_customer rc on rc.CUSTOMER_ID = r.DELEGATE_COMPANY
 , pro_project   pp 
@@ -96,12 +102,13 @@ UNION all
 where 	
  `r`.PROJECT_ID = pp.PROJECT_ID 
   and `r`.PROJECT_ID = pdpp.BID_PROJECT_ID
-and pdpp.XYGH_FLAG = 1 
+and ( (pdpp.XYGH_FLAG = 1 and pdpp.IS_BID_EID is null) or pdpp.IS_BID_EID = 1   or pp.IS_EBID = 1  )
 and r.`finished_approval` = 1
 AND r.`project_type_id` IN('BID', 'PROCUREMENT')
 -- AND r.`organization_type` = 3
 -- AND r.`not_include` = 0 
 and EXISTS ( select '1' from pro_bid_section pbss where pbss.PROJECT_ID = r.PROJECT_ID );
+
 
 create or replace view view_oa_service_customer as
 SELECT distinct `r`.`customer_id`                  ,-- AS `招标人id`,

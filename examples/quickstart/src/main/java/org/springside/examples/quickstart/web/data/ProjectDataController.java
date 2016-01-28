@@ -55,14 +55,14 @@ public class ProjectDataController {
 	@Autowired
 	private BulletinDataDao bulletinDataDao;
 
+
 	@RequestMapping(method = RequestMethod.GET)
 	public String list(@RequestParam(value = "page", defaultValue = "1") int pageNumber,
 			@RequestParam(value = "page.size", defaultValue = PAGE_SIZE) int pageSize,
 			@RequestParam(value = "sortType", defaultValue = "delegateDate") String sortType, Model model,
 			ServletRequest request) {
 		Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
-		//Long userId = getCurrentUserId();
-
+		
 		Page<ProjectData> projects = projectDataService.getProjectData(searchParams, pageNumber, pageSize, sortType);
 		for(ProjectData projectData : projects){//对bulletinDocView对象处理
 			projectData.setBulletinDatas(bulletinDataDao.findBulletinData(projectData.getProjectId()) );

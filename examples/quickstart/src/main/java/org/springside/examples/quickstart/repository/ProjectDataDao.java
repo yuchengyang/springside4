@@ -7,6 +7,7 @@ package org.springside.examples.quickstart.repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -39,4 +40,7 @@ public interface ProjectDataDao extends PagingAndSortingRepository<ProjectData, 
 	
 	@Query("SELECT min( delegateDate ) FROM ProjectData where synStatus < 2 and projType = 'm' ")
 	Date findMinSynDate();
+	
+	@Query("SELECT distinct departmentId,organizationName FROM ProjectData ")
+	List<Map<String , Object>> findOrgAndName();
 }

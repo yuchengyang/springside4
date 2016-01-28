@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springside.examples.quickstart.entity.User;
+import org.springside.examples.quickstart.repository.ProjectDataDao;
 import org.springside.examples.quickstart.service.account.AccountService;
 
 /**
@@ -32,6 +33,9 @@ public class UserAdminController {
 
 	@Autowired
 	private AccountService accountService;
+	
+	@Autowired
+	private ProjectDataDao projectDataDao;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String list(Model model) {
@@ -44,6 +48,7 @@ public class UserAdminController {
 	@RequestMapping(value = "update/{id}", method = RequestMethod.GET)
 	public String updateForm(@PathVariable("id") Long id, Model model) {
 		model.addAttribute("user", accountService.getUser(id));
+		model.addAttribute("orgAndNames", projectDataDao.findOrgAndName());
 		return "account/adminUserForm";
 	}
 

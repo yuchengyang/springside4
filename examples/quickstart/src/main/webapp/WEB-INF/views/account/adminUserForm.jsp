@@ -37,6 +37,20 @@
 					<input type="password" id="confirmPassword" name="confirmPassword" class="input-large" equalTo="#plainPassword" />
 				</div>
 			</div>
+			
+			<div class="control-group">
+				<label for="confirmPassword" class="control-label">queryOrg:</label>
+				<div class="controls">
+					参考机构：<span>
+						<c:forEach var="orgAndName" items="${orgAndNames}">
+							${orgAndName[1]}&nbsp;&nbsp;
+						</c:forEach>
+					</span>
+					<br>
+					<textarea id="queryOrg" name="queryOrg" class="input-large">${user.queryOrg}</textarea>请填入上述的参考机构名称（多个以“,”分隔）
+				</div>
+			</div>
+			
 			<div class="control-group">
 				<label class="control-label">注册日期:</label>
 				<div class="controls">

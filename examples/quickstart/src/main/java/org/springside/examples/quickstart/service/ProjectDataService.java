@@ -25,6 +25,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +41,14 @@ import org.springside.examples.oadata.repository.ProjectStepViewDao;
 import org.springside.examples.oadata.service.BuyerViewService;
 import org.springside.examples.oadata.service.ProjecgtRuleViewService;
 import org.springside.examples.quickstart.entity.ProjectData;
+import org.springside.examples.quickstart.entity.User;
 import org.springside.examples.quickstart.entity.xmlnode.BodyXml;
 import org.springside.examples.quickstart.entity.xmlnode.HeadXml;
 import org.springside.examples.quickstart.entity.xmlnode.ProjectXml;
 import org.springside.examples.quickstart.repository.BulletinDataDao;
 import org.springside.examples.quickstart.repository.ProjectDataDao;
+import org.springside.examples.quickstart.repository.UserDao;
+import org.springside.examples.quickstart.service.account.ShiroDbRealm.ShiroUser;
 import org.springside.modules.persistence.DynamicSpecifications;
 import org.springside.modules.persistence.SearchFilter;
 import org.springside.modules.persistence.SearchFilter.Operator;
@@ -106,6 +110,8 @@ public class ProjectDataService {
 	@Autowired
 	ProjectStepViewDao projectStepViewDao;
 	
+	@Autowired 
+	UserDao userDao;
 	
 	public Page<ProjectData> getProjectData( Map<String, Object> searchParams, int pageNumber, int pageSize, String sortType) {
 		PageRequest pageRequest = buildPageRequest(pageNumber, pageSize, sortType);
@@ -130,10 +136,22 @@ public class ProjectDataService {
 	 * 创建动态查询条件组合.
 	 */
 	private Specification<ProjectData> buildSpecification(Map<String, Object> searchParams) {
+		
+		ShiroUser currentUser = (ShiroUser) SecurityUtils.getSubject().getPrincipal();
+		User user  = userDao.findOne(currentUser.id);
+		
 		Map<String, SearchFilter> filters = SearchFilter.parse(searchParams);
 		filters.put("projType", new SearchFilter("projType", Operator.EQ, ProjectData.PROJTYPE_PROJ));
 		filters.put("useStatus", new SearchFilter("useStatus", Operator.EQ, ProjectData.USESTATUS_VALID));
-
+		
+		if(!StringUtils.isEmpty(user.getQueryOrg())){
+			filters.put("organizationName", new SearchFilter("organizationName", Operator.IN, user.getQueryOrg().split(",")));
+		}
+		
+//		else{
+//			filters.put("organizationName", new SearchFilter("organizationName", Operator.IN, new String[]{"-1"}));
+//		}
+		
 		Specification<ProjectData> spec = DynamicSpecifications.bySearchFilter(filters.values(), ProjectData.class);
 		return spec;
 	}

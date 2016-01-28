@@ -11,8 +11,10 @@
 	<script type="text/javascript">
 	var remoteUrl = "http://${pageContext.request.serverName}:${pageContext.request.serverPort}${pageContext.request.contextPath}";
 	
-	function synProject(){
+	function synProject(id){
 		var ids = [];
+		ids.push(id);
+		/*
 		var checkradio = true;
 		$.each($('input[name=checkID]:checked'),function( idx, obj ){
 			var radiochecked = $(obj).parent().parent().find("input[type=radio]:checked");
@@ -24,6 +26,7 @@
 				ids.push( $(obj).val() + ':'+ $(radiochecked).val() );
 			}
 		});	
+		*/
 		
 		/*
 		if(!checkradio){
@@ -82,7 +85,15 @@
 			至
 			<input type="text" name="search_LTE_delegateDate" class="input-medium"  value="${param.search_LTE_delegateDate}">
 			例如（2001-05）
-			
+			<label>同步阶段:</label>
+			<select name="search_EQ_synStatus">
+				<option value="">全部</option>
+				<option value="0">待同步</option>
+				<option value="1">采购人同步完毕</option>
+				<option value="2">基本信息同步完毕</option>
+				<option value="3">采购文件同步完毕</option>
+			</select>
+			<script type="text/javascript">$("select[name=search_EQ_synStatus]").val('${param.search_EQ_synStatus}');</script>
 			<button type="submit" class="btn" id="search_btn">Search</button>
 		    </form>
 	    </div>
@@ -91,26 +102,28 @@
 	
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead><tr>
-		<th><input type="checkbox" id="checkAll" onchange="checkAllorNot(this);"></th>
+		<!-- <th><input type="checkbox" id="checkAll" onchange="checkAllorNot(this);"></th> -->
 		<th>项目名称</th>
 		<th>项目Code</th>
 		<th>项目经理</th>
 		<th>项目部门</th>
 		<th>立项日期</th>
 		<th>同步阶段</th>
+		<th>operator</th>
 		</tr></thead>
 		<tbody>
 		
 		
 		<c:forEach items="${projects.content}" var="project">
 			<tr>
-				<td style="width:20px;"><input type="checkbox" name="checkID"  <c:if test="${project.synStatus eq '4' }">disabled="disabled"  readonly="readonly" </c:if>value="${project.id}"></td>
+				<%-- <td style="width:20px;"><input type="checkbox" name="checkID"  <c:if test="${project.synStatus eq '4' }">disabled="disabled"  readonly="readonly" </c:if>value="${project.id}"></td> --%>
 				<td style="width:380px;"><a target="_blank" href="${ctx}/oa/getProjectDetail?projectId=${project.projectId}">${project.projectName}</a></td>
 				<td style="width:150px;">${project.projectCode}</td>
 				<td style="width:100px;">${project.creatorName}</td>
 				<td style="width:100px;">${project.organizationName}</td>
 				<td style="width:80px;"><fmt:formatDate value="${project.delegateDate}" pattern="yyyy-MM-dd"/></td>
 				<td>${project.synStatusCN }</td>
+				<td><button type="button" onclick="synProject('${project.id}')" <c:if test="${project.synStatus eq '4' }">disabled="disabled"</c:if> >同步</button></td>
 			</tr>
 		</c:forEach>
 		</tbody>
@@ -118,6 +131,6 @@
 	
 	<tags:pagination page="${projects}" paginationSize="20"/>
 
-	<div><a class="btn" href="javascript:synProject();">同步</a></div>
+	<!-- <div><a class="btn" href="javascript:synProject();">同步</a></div> -->
 </body>
 </html>

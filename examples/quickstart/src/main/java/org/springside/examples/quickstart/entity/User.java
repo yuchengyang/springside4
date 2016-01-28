@@ -29,6 +29,7 @@ public class User extends IdEntity {
 	private String password;
 	private String salt;
 	private String roles;
+	private String queryOrg;
 	private Date registerDate;
 
 	public User() {
@@ -106,6 +107,14 @@ public class User extends IdEntity {
 
 	public void setRegisterDate(Date registerDate) {
 		this.registerDate = registerDate;
+	}
+	
+	public String getQueryOrg() {
+		return queryOrg;
+	}
+
+	public void setQueryOrg(String queryOrg) {
+		this.queryOrg = queryOrg;
 	}
 
 	@Override
