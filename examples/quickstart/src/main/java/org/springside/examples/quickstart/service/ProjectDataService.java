@@ -5,26 +5,16 @@
  *******************************************************************************/
 package org.springside.examples.quickstart.service;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +32,6 @@ import org.springside.examples.oadata.service.BuyerViewService;
 import org.springside.examples.oadata.service.ProjecgtRuleViewService;
 import org.springside.examples.quickstart.entity.ProjectData;
 import org.springside.examples.quickstart.entity.User;
-import org.springside.examples.quickstart.entity.xmlnode.BodyXml;
-import org.springside.examples.quickstart.entity.xmlnode.HeadXml;
 import org.springside.examples.quickstart.entity.xmlnode.ProjectXml;
 import org.springside.examples.quickstart.repository.BulletinDataDao;
 import org.springside.examples.quickstart.repository.ProjectDataDao;
@@ -187,16 +175,16 @@ public class ProjectDataService {
 				//同步项目
 				result = result | synProjectProccess( projectData );
 			}
-			if(ProjectData.SYNSTATUS_BASEINFO_SUCCESS == projectData.getSynStatus() ){
-				//同步招标文件
-				result = result | projecgtRuleViewService.sysProjectDoc(projectData);
-			}
-			if(ProjectData.SYNSTATUS_DOC_SUCCESS == projectData.getSynStatus() ){
-				//同步公告
-				if( projectData.getBulletinDataSelected() != null ){
-					result = result | bulletinDataService.sysBulletinProccess( projectData );
-				}
-			}
+//			if(ProjectData.SYNSTATUS_BASEINFO_SUCCESS == projectData.getSynStatus() ){
+//				//同步招标文件
+//				result = result | projecgtRuleViewService.sysProjectDoc(projectData);
+//			}
+//			if(ProjectData.SYNSTATUS_DOC_SUCCESS == projectData.getSynStatus() ){
+//				//同步公告
+//				if( projectData.getBulletinDataSelected() != null ){
+//					result = result | bulletinDataService.sysBulletinProccess( projectData );
+//				}
+//			}
 			resultreturn = resultreturn ||  result;
 		}
 		return resultreturn;
@@ -211,54 +199,59 @@ public class ProjectDataService {
 		projectData.setPrequalification(prequalificationCountInteger!=null && prequalificationCountInteger > 0 ?"1":"0");
 		
 		boolean result = false;
-		//发送
-        StringWriter writer = new StringWriter();  
-        
-        BodyXml<ProjectData> bodyXml = new BodyXml<ProjectData>();
-        bodyXml.setProjectInfo(projectData);
-        ProjectXml projectXml =  new ProjectXml();
-        projectXml.setBody(bodyXml);
-        HeadXml header = new HeadXml( projectData.getDepartmentId() ,projectData.getCreator() );
-        projectXml.setHeader(header);
-        
-        try {
-			marshaller.marshal(projectXml, writer);
-		} catch (JAXBException e) {
-			logger.error("project {}|{} XML convert error:", projectData.getId() , projectData.getProjectCode() );
-		}  
-		try {
-			
-			HttpPost httpPost = new HttpPost( propertiesLoader.getProperty("syn.synProjectUrl") );
-            // 创建名/值组列表  
-            List<NameValuePair> parameters = new ArrayList<NameValuePair>();  
-            
-            String xmlContent = writer.toString();
-            
-            parameters.add(new BasicNameValuePair( "xmlContent",xmlContent ));  
-            // 创建UrlEncodedFormEntity对象  
-            UrlEncodedFormEntity formEntiry = new UrlEncodedFormEntity( parameters , "UTF-8");  
-            httpPost.setEntity(formEntiry); 
-            
-			// 创建包含connection pool与超时设置的client
-			CloseableHttpResponse closeableHttpResponse  = httpClient.execute(httpPost);
-			closeableHttpResponse.getEntity().getContent();
-			String xmlContentresp = IOUtils.toString(closeableHttpResponse.getEntity().getContent());
-			if(xmlContentresp.contains("operTag")){
-				String operTag = StringUtils.substringBetween(xmlContentresp, "<operTag>", "</operTag>");
-				if("Y".equals(operTag)){//成功   
-					//更新同步状态 
-					projectData.setSynStatus( ProjectData.SYNSTATUS_BASEINFO_SUCCESS );
-					projectDataDao.save( projectData );
-					result = true;
-				}else{
-					logger.error("project[{}|{}] update failed！", projectData.getId() , projectData.getProjectCode());
-				}
-			}
-			closeableHttpResponse.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error("project[{}|{}] connect error :",projectData.getId() , projectData.getProjectCode());
-		}
+//		//发送
+//        StringWriter writer = new StringWriter();  
+//        
+//        BodyXml<ProjectData> bodyXml = new BodyXml<ProjectData>();
+//        bodyXml.setProjectInfo(projectData);
+//        ProjectXml projectXml =  new ProjectXml();
+//        projectXml.setBody(bodyXml);
+//        HeadXml header = new HeadXml( projectData.getDepartmentId() ,projectData.getCreator() );
+//        projectXml.setHeader(header);
+//        
+//        try {
+//			marshaller.marshal(projectXml, writer);
+//		} catch (JAXBException e) {
+//			logger.error("project {}|{} XML convert error:", projectData.getId() , projectData.getProjectCode() );
+//		}  
+//		try {
+//			
+//			HttpPost httpPost = new HttpPost( propertiesLoader.getProperty("syn.synProjectUrl") );
+//            // 创建名/值组列表  
+//            List<NameValuePair> parameters = new ArrayList<NameValuePair>();  
+//            
+//            String xmlContent = writer.toString();
+//            
+//            parameters.add(new BasicNameValuePair( "xmlContent",xmlContent ));  
+//            // 创建UrlEncodedFormEntity对象  
+//            UrlEncodedFormEntity formEntiry = new UrlEncodedFormEntity( parameters , "UTF-8");  
+//            httpPost.setEntity(formEntiry); 
+//            
+//			// 创建包含connection pool与超时设置的client
+//			CloseableHttpResponse closeableHttpResponse  = httpClient.execute(httpPost);
+//			closeableHttpResponse.getEntity().getContent();
+//			String xmlContentresp = IOUtils.toString(closeableHttpResponse.getEntity().getContent());
+//			if(xmlContentresp.contains("operTag")){
+//				String operTag = StringUtils.substringBetween(xmlContentresp, "<operTag>", "</operTag>");
+//				if("Y".equals(operTag)){//成功   
+//					//更新同步状态 
+//					projectData.setSynStatus( ProjectData.SYNSTATUS_BASEINFO_SUCCESS );
+//					projectDataDao.save( projectData );
+//					result = true;
+//				}else{
+//					logger.error("project[{}|{}] update failed！", projectData.getId() , projectData.getProjectCode());
+//				}
+//			}
+//			closeableHttpResponse.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			logger.error("project[{}|{}] connect error :",projectData.getId() , projectData.getProjectCode());
+//		}
+		
+		//更新同步状态 
+		projectData.setSynStatus( ProjectData.SYNSTATUS_BASEINFO_SUCCESS );
+		projectDataDao.save( projectData );
+		result = true;
 		return result;
 	}
 	
